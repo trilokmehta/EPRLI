@@ -8,9 +8,15 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
+        /* Define theme colors - now only light mode constants */
+        :root {
+            --color-primary: #007AFF; /* Modern Blue Accent */
+            --color-light-bg: #F0F4F7; /* Subtle cool background */
+        }
+
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f0f2f5; /* A slightly more professional off-white */
+            background-color: var(--color-light-bg);
         }
         .fade-in {
             animation: fadeIn 0.5s ease-in-out forwards;
@@ -19,72 +25,64 @@
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        /* --- FIX: Updated button size for better mobile tap target and spacing --- */
+        /* --- Palette Button Sizing --- */
         .question-palette-btn {
-            width: 35px; /* Slightly larger default size for mobile (was 30px) */
-            height: 35px; /* Slightly larger default size for mobile (was 30px) */
+            width: 35px;
+            height: 35px;
         }
-        @media (min-width: 640px) { /* sm breakpoint */
+        @media (min-width: 640px) {
             .question-palette-btn {
-                width: 40px; /* Larger size for tablets/desktops */
+                width: 40px;
                 height: 40px;
             }
-        }  
-        /* --- END FIX --- */
-        .not-visited { background-color: #e2e8f0; color: #475569; }
-        .answered { background-color: #16a34a; color: white; }
-        .not-answered { background-color: #dc2626; color: white; }
-        .marked { background-color: #6d28d9; color: white; }
+        }
+        /* --- Palette Status Colors (Using reliable semantic colors for status) --- */
+        .not-visited { background-color: #E5E7EB; color: #4B5563; } /* Light gray */
+        .answered { background-color: #10B981; color: white; } /* Green */
+        .not-answered { background-color: #EF4444; color: white; } /* Red */
+        .marked { background-color: #8B5CF6; color: white; } /* Violet */
         .answered-marked {
-             background: linear-gradient(45deg, #16a34a 50%, #6d28d9 50%);
+             background: linear-gradient(45deg, #10B981 50%, #8B5CF6 50%);
              color: white;
         }
         .current-q {
-            border: 2px solid #2563eb;
+            border: 2px solid var(--color-primary);
         }
-    
+
         /* Mobile-specific improvements */
         @media (max-width: 640px) {
             .question-options button {
                 min-height: 48px;
                 padding: 12px 16px;
             }
-            .quiz-header {
-                padding: 16px 12px;
-            }
-            .mobile-stack {
-                flex-direction: column;
-            }
-            .mobile-full-width {
-                width: 100%;
-            }
         }
-
-        /* Touch-friendly improvements */
         .touch-target {
             min-height: 44px;
             min-width: 44px;
         }
-
-        /* Mobile keyboard spacing */
-        .mobile-keyboard-spacing {
-            padding-bottom: 80px;
+        /* Light mode option button base styling */
+        .option-button-base {
+             color: #4B5563; /* Gray text */
+             background-color: white;
+             border-color: #D1D5DB; /* Light gray border */
         }
-
+        .option-button-base:not([disabled]):hover {
+            background-color: #F9FAFB; /* Light hover */
+        }
     </style>
 </head>
-<body class="text-slate-800">
+<body class="text-gray-900">
 
     <div id="app">
         <header class="bg-white shadow-md sticky top-0 z-40">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-4 md:px-8">
                 <div class="flex items-center justify-between h-16">
                     <div class="flex items-center">
-                        <span class="font-extrabold text-2xl text-blue-600">CUET Pro</span>
+                        <span class="font-extrabold text-2xl" style="color: var(--color-primary);">CUET Pro</span>
                     </div>
                     <div class="flex items-center">
-                        <span class="mr-3 font-semibold text-slate-700 hidden sm:block">Aarav Sharma</span>
-                        <div class="w-10 h-12 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold text-lg">
+                        <span class="mr-3 font-semibold text-gray-700 hidden sm:block">Aarav Sharma</span>
+                        <div class="w-10 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg" style="background-color: var(--color-primary);">
                             A
                         </div>
                     </div>
@@ -92,16 +90,17 @@
             </div>
         </header>
 
-        <div class="max-w-7xl mx-auto p-4 md:p-3 md:p-6 lg:p-4 md:p-8">
+        <div class="max-w-7xl mx-auto p-4 md:p-6 lg:p-8">
             <div id="view-container">
 
                 <main id="subjects-view" class="fade-in">
-                    <h1 class="text-xl md:text-3xl font-bold text-slate-900 mb-2">Dashboard</h1>
-                    <p class="text-slate-600 mb-8">Time to focus. Pick a subject and get to work.</p>
-                    <div id="subjects-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 md:p-6">
+                    <h1 class="text-xl md:text-3xl font-bold mb-2 text-gray-800">Dashboard</h1>
+                    <p class="text-gray-500 mb-8">Time to focus. Pick a subject and get to work.</p>
+
+                    <div id="subjects-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
                         </div>
                     <div id="loading-spinner" class="text-center p-10">
-                        <svg class="animate-spin h-10 w-8 text-slate-500 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <svg class="animate-spin h-10 w-8 text-gray-500 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                         </svg>
@@ -109,26 +108,26 @@
                 </main>
 
                 <section id="subject-detail-view" class="hidden fade-in">
-                    <button id="back-to-dashboard" class="mb-6 inline-flex items-center text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors">
+                    <button id="back-to-dashboard" class="mb-6 inline-flex items-center text-sm font-medium text-gray-600 hover:text-blue-500 transition-colors">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><path d="m15 18-6-6 6-6"/></svg>
                         Back to Dashboard
                     </button>
-                    <div class="bg-white p-3 md:p-6 rounded-2xl shadow-lg">
-                        <h2 id="subject-title" class="text-xl md:text-3xl font-bold mb-1"></h2>
-                        <p class="text-slate-500 mb-8">Choose how you want to prepare. Don't waste time.</p>
-                        <div class="grid md:grid-cols-2 gap-3 md:p-6">
-                            <button id="practice-questions-btn" class="text-left p-3 md:p-6 bg-slate-50 hover:bg-blue-50 hover:border-blue-500 border-2 border-transparent rounded-xl transition-all flex items-start">
-                                <span class="text-2xl md:text-4xl mr-5">📘</span>
+                    <div class="bg-white p-3 md:p-6 rounded-xl shadow-lg">
+                        <h2 id="subject-title" class="text-xl md:text-3xl font-bold mb-1 text-gray-800"></h2>
+                        <p class="text-gray-500 mb-8">Choose how you want to prepare. Don't waste time.</p>
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <button id="practice-questions-btn" class="text-left p-4 md:p-6 bg-gray-50 hover:bg-gray-100 border-2 border-transparent hover:border-blue-400 rounded-xl transition-all flex items-start">
+                                <span class="text-2xl md:text-4xl mr-5 text-blue-500">📘</span>
                                 <div>
-                                    <h3 class="font-bold text-lg">Practice Questions</h3>
-                                    <p class="text-sm text-slate-600 mt-1">Review all available questions at your own pace. No timers, no pressure.</p>
+                                    <h3 class="font-bold text-lg text-gray-800">Practice Questions</h3>
+                                    <p class="text-sm text-gray-500 mt-1">Review all available questions at your own pace. No timers, no pressure.</p>
                                 </div>
                             </button>
-                            <button id="create-mock-btn" class="text-left p-3 md:p-6 bg-slate-50 hover:bg-blue-50 hover:border-blue-500 border-2 border-transparent rounded-xl transition-all flex items-start">
-                                <span class="text-2xl md:text-4xl mr-5">🎯</span>
+                            <button id="create-mock-btn" class="text-left p-4 md:p-6 bg-gray-50 hover:bg-gray-100 border-2 border-transparent hover:border-blue-400 rounded-xl transition-all flex items-start">
+                                <span class="text-2xl md:text-4xl mr-5 text-pink-500">🎯</span>
                                 <div>
-                                    <h3 class="font-bold text-lg">Create Mock Test</h3>
-                                    <p class="text-sm text-slate-600 mt-1">Simulate exam conditions. Set your questions, face the clock.</p>
+                                    <h3 class="font-bold text-lg text-gray-800">Create Mock Test</h3>
+                                    <p class="text-sm text-gray-500 mt-1">Simulate exam conditions. Set your questions, face the clock.</p>
                                 </div>
                             </button>
                         </div>
@@ -136,93 +135,94 @@
                 </section>
 
                 <section id="test-view" class="hidden">
-                    <div class="grid lg:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 md:p-6">
-                        <div class="lg:col-span-2 bg-white p-3 md:p-6 rounded-2xl shadow-lg">
-                            <div class="flex justify-between items-center mb-4 border-b pb-4">
+                    <div class="grid lg:grid-cols-3 gap-6">
+                        <div class="lg:col-span-2 bg-white p-4 md:p-8 rounded-xl shadow-lg">
+                            <div class="flex justify-between items-center mb-4 border-b border-gray-200 pb-4">
                                 <h2 id="test-title" class="text-xl font-bold"></h2>
-                                <div><span id="question-topic" class="text-sm font-medium text-white bg-blue-600 px-3 py-1 rounded-full">Topic</span></div>
+                                <div><span id="question-topic" class="text-sm font-medium text-white px-3 py-1 rounded-full" style="background-color: var(--color-primary);">Topic</span></div>
                             </div>
                             <p class="text-gray-500 text-sm mb-4">Question <span id="current-q-number" class="font-bold">1</span> of <span id="total-q-number" class="font-bold">10</span></p>
                             <p id="question-text" class="text-lg mb-6 leading-relaxed"></p>
                             <div id="options-container" class="space-y-3"></div>
+
                             <div id="feedback-message" class="hidden p-3 rounded-lg my-4 text-sm font-medium"></div>
-                            <div class="flex items-center justify-between border-t border-slate-200 mt-6 pt-4">
-                                <button id="mark-review-btn" class="px-5 py-2.5 bg-violet-600 text-white rounded-lg hover:bg-violet-700 transition-colors text-sm font-medium">Mark for Review</button>
-                                <div class="flex space-x-4">
-                                    <button id="clear-response-btn" class="px-5 py-2.5 bg-slate-200 text-slate-800 rounded-lg hover:bg-slate-300 transition-colors text-sm font-medium">Clear</button>
-                                    <button id="next-question-btn" class="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium disabled:bg-slate-400">Save & Next</button>
+                            <div class="flex items-center justify-between border-t border-gray-200 mt-6 pt-4">
+                                <button id="mark-review-btn" class="px-5 py-2.5 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium">Mark for Review</button>
+                                <div class="flex space-x-3">
+                                    <button id="clear-response-btn" class="px-5 py-2.5 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors text-sm font-medium">Clear</button>
+                                    <button id="next-question-btn" class="px-6 py-2.5 text-white rounded-lg hover:opacity-90 transition-colors text-sm font-medium disabled:bg-gray-400" style="background-color: var(--color-primary);">Save & Next</button>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="bg-white p-3 md:p-6 rounded-2xl shadow-lg self-start">
+                        <div class="bg-white p-4 md:p-6 rounded-xl shadow-lg self-start">
                             <div class="flex justify-between items-center mb-4">
                                 <h3 class="font-bold">Time Left:</h3>
-                                <div id="timer" class="text-xl font-bold bg-slate-100 text-red-600 px-4 py-2 rounded-lg">29:59</div>
+                                <div id="timer" class="text-xl font-bold bg-gray-100 text-red-600 px-4 py-2 rounded-lg">29:59</div>
                             </div>
-                            <div id="question-palette" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 sm:grid-cols-2 sm:grid-cols-4 md:grid-cols-8 gap-3 mb-4 border-t pt-4"></div>
-                             <div class="space-y-2 text-sm text-slate-600 mb-4 border-t pt-4">
+                            <div id="question-palette" class="grid grid-cols-5 gap-3 mb-4 border-t border-gray-200 pt-4"></div>
+                             <div class="space-y-2 text-sm text-gray-600 mb-4 border-t border-gray-200 pt-4">
                                 <p><span class="inline-block w-3 h-3 rounded-full bg-green-500 mr-2"></span>Answered</p>
                                 <p><span class="inline-block w-3 h-3 rounded-full bg-red-600 mr-2"></span>Not Answered</p>
-                                <p><span class="inline-block w-3 h-3 rounded-full bg-violet-700 mr-2"></span>Marked for Review</p>
-                                <p><span class="inline-block w-3 h-3 rounded-full bg-slate-300 mr-2"></span>Not Visited</p>
+                                <p><span class="inline-block w-3 h-3 rounded-full bg-purple-700 mr-2"></span>Marked for Review</p>
+                                <p><span class="inline-block w-3 h-3 rounded-full bg-gray-300 mr-2"></span>Not Visited</p>
                              </div>
                             <button id="submit-test-btn" class="w-full py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold">Submit Test</button>
                         </div>
                     </div>
                 </section>
-                
+
                 <section id="results-view" class="hidden fade-in text-center">
-                     <div class="bg-white max-w-2xl mx-auto p-4 md:p-8 rounded-2xl shadow-lg">
+                     <div class="bg-white max-w-2xl mx-auto p-4 md:p-8 rounded-xl shadow-lg">
                          <h2 class="text-xl md:text-3xl font-bold mb-2">Test Complete!</h2>
-                         <p class="text-slate-600 mb-8">"Good. Now analyze your mistakes and do it again, but better."</p>
+                         <p class="text-gray-600 mb-8">"Good. Now analyze your mistakes and do it again, but better."</p>
                          <div class="mb-8">
-                             <span id="score-text" class="text-xl md:text-3xl md:text-6xl font-extrabold text-blue-600"></span>
-                             <p class="text-slate-500 font-medium mt-1">Score</p>
+                             <span id="score-text" class="text-xl md:text-6xl font-extrabold" style="color: var(--color-primary);"></span>
+                             <p class="text-gray-500 font-medium mt-1">Score</p>
                          </div>
-                         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 text-center p-3 md:p-6 bg-slate-50 rounded-lg mb-8">
+                         <div class="grid grid-cols-3 gap-4 text-center p-3 md:p-6 bg-gray-50 rounded-lg mb-8">
                             <div>
                                 <p id="results-correct" class="font-bold text-2xl text-green-600">0</p>
-                                <p class="text-sm text-slate-500">Correct</p>
+                                <p class="text-sm text-gray-500">Correct</p>
                             </div>
                             <div>
                                 <p id="results-incorrect" class="font-bold text-2xl text-red-600">0</p>
-                                <p class="text-sm text-slate-500">Incorrect</p>
+                                <p class="text-sm text-gray-500">Incorrect</p>
                             </div>
                             <div>
-                                <p id="results-unattempted" class="font-bold text-2xl text-slate-700">0</p>
-                                <p class="text-sm text-slate-500">Unattempted</p>
+                                <p id="results-unattempted" class="font-bold text-2xl text-gray-700">0</p>
+                                <p class="text-sm text-gray-500">Unattempted</p>
                             </div>
                          </div>
-                         <button id="results-back-btn" class="w-full max-w-xs mx-auto px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold">Back to Subject</button>
+                         <button id="results-back-btn" class="w-full max-w-xs mx-auto px-6 py-3 text-white rounded-lg hover:opacity-90 transition-colors font-semibold" style="background-color: var(--color-primary);">Back to Subject</button>
                      </div>
                 </section>
 
             </div>
         </div>
     </div>
-    
+
     <div id="mock-modal" class="hidden fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm p-3 md:p-6 fade-in">
             <h3 class="text-xl font-bold mb-5">Create Mock Test</h3>
             <div class="space-y-5">
                 <div>
-                    <label for="question-count" class="block text-sm font-medium text-slate-700 mb-1.5">Number of Questions:</label>
-                    <select id="question-count" class="w-full p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    <label for="question-count" class="block text-sm font-medium text-gray-700 mb-1.5">Number of Questions:</label>
+                    <select id="question-count" class="w-full p-2.5 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                         <option>10</option><option>20</option><option>30</option><option>40</option><option selected>50</option>
                     </select>
-                    <p class="text-sm text-slate-500 mt-1">Total available for this subject: <span id="total-questions-count">0</span></p>
+                    <p class="text-sm text-gray-500 mt-1">Total available for this subject: <span id="total-questions-count">0</span></p>
                 </div>
                  <div>
-                    <label for="time-limit" class="block text-sm font-medium text-slate-700 mb-1.5">Time Limit (Minutes):</label>
-                    <select id="time-limit" class="w-full p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    <label for="time-limit" class="block text-sm font-medium text-gray-700 mb-1.5">Time Limit (Minutes):</label>
+                    <select id="time-limit" class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                         <option>15</option><option selected>30</option><option>45</option><option>60</option>
                     </select>
                 </div>
             </div>
             <div class="mt-8 flex justify-end space-x-3">
-                <button id="cancel-mock-btn" class="px-4 py-2 bg-slate-200 text-slate-800 rounded-lg hover:bg-slate-300 transition-colors text-sm font-medium">Cancel</button>
-                <button id="start-mock-btn" class="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium">Start Test</button>
+                <button id="cancel-mock-btn" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors text-sm font-medium">Cancel</button>
+                <button id="start-mock-btn" class="px-5 py-2 text-white rounded-lg hover:opacity-90 transition-colors text-sm font-medium" style="background-color: var(--color-primary);">Start Test</button>
             </div>
         </div>
     </div>
@@ -230,9 +230,9 @@
     <div id="confirm-modal" class="hidden fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm p-3 md:p-6 fade-in text-center">
             <h3 id="confirm-title" class="text-xl font-bold mb-3">Are you sure?</h3>
-            <p id="confirm-message" class="text-slate-600 mb-6">You want to submit the test.</p>
+            <p id="confirm-message" class="text-gray-600 mb-6">You want to submit the test.</p>
             <div class="flex justify-center space-x-4">
-                <button id="confirm-cancel-btn" class="px-6 py-2.5 bg-slate-200 text-slate-800 rounded-lg hover:bg-slate-300 transition-colors font-medium">Cancel</button>
+                <button id="confirm-cancel-btn" class="px-6 py-2.5 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors font-medium">Cancel</button>
                 <button id="confirm-ok-btn" class="px-6 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium">Submit</button>
             </div>
         </div>
@@ -241,18 +241,19 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            
+
+            // Dark Mode Logic Removed (Only initializing the light theme is needed)
+            document.body.classList.remove('dark'); 
 
             // --- Supabase Client Initialization ---
-            const SUPABASE_URL = 'https://oqhnppdjdnhvgsuyahvf.supabase.co'; // Paste your Project URL here
-            const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9xaG5wcGRqZG5odmdzdXlhaHZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkwODUxMDksImV4cCI6MjA3NDY2MTEwOX0._wE7NQlx1ydARupFbjv6O77srl4b85MAeSSbRjOjj00'; // Paste your anon public key here
+            const SUPABASE_URL = 'https://oqhnppdjdnhvgsuyahvf.supabase.co'; 
+            const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9xaG5wcGRqZG5odmdzdXlhaHZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkwODUxMDksImV4cCI6MjA3NDY2MTEwOX0._wE7NQlx1ydARupFbjv6O77srl4b85MAeSSbRjOjj00'; 
 
-            // Renamed the client instance to avoid TDZ conflict with the global 'supabase' object
             const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
             // --- DOM Elements ---
             const views = {
-                subjects: document.getElementById('subjects-view'),
+                dashboard: document.getElementById('subjects-view'),
                 subjectDetail: document.getElementById('subject-detail-view'),
                 test: document.getElementById('test-view'),
                 results: document.getElementById('results-view'),
@@ -264,7 +265,7 @@
             const backToDashboardBtn = document.getElementById('back-to-dashboard');
             const createMockBtn = document.getElementById('create-mock-btn');
             const practiceQuestionsBtn = document.getElementById('practice-questions-btn');
-            
+
             // Modals
             const mockModal = document.getElementById('mock-modal');
             const cancelMockBtn = document.getElementById('cancel-mock-btn');
@@ -273,7 +274,7 @@
             const timeLimitSelect = document.getElementById('time-limit');
             const totalQuestionsCount = document.getElementById('total-questions-count');
             const confirmModal = document.getElementById('confirm-modal');
-            
+
             // Test View Elements
             const testTitle = document.getElementById('test-title');
             const questionTopic = document.getElementById('question-topic');
@@ -288,6 +289,7 @@
             const timerEl = document.getElementById('timer');
             const questionPalette = document.getElementById('question-palette');
             const submitTestBtn = document.getElementById('submit-test-btn');
+
 
             // Results View Elements
             const resultsView = document.getElementById('results-view');
@@ -304,46 +306,51 @@
             let currentMode = ''; // 'practice' or 'mock'
             let score = 0, timerInterval = null;
 
-            
-            // --- Data Fetching (Updated for Supabase) ---
+
+            // --- Data Fetching ---
             async function fetchData() {
                 try {
-                    // Fetch subjects and questions from Supabase in parallel
                     const [subjectsResponse, questionsResponse] = await Promise.all([
                         supabaseClient.from('subjects').select('*'),
-                        supabaseClient.from('math').select('*')
+                        supabaseClient.from('questions').select('*')
                     ]);
 
-                    // Error handling
                     if (subjectsResponse.error) throw subjectsResponse.error;
                     if (questionsResponse.error) throw questionsResponse.error;
 
-                    // Assign data to state variables
                     allSubjects = subjectsResponse.data;
                     allQuestions = questionsResponse.data;
 
                     displaySubjects();
                 } catch (error) {
                     console.error("Failed to fetch data from Supabase:", error);
-                    subjectsGrid.innerHTML = `<p class="col-span-full text-center text-red-500">Could not load data from the database. Please check your connection or contact support.</p>`;
+                    subjectsGrid.innerHTML = `<p class="col-span-full text-center text-red-500">
+                        Could not load data. Check console (F12) for Supabase errors.
+                    </p>`;
                 } finally {
                     loadingSpinner.classList.add('hidden');
+                    switchView('dashboard');
                 }
             }
+
             // --- UI Rendering ---
             function displaySubjects() {
                 subjectsGrid.innerHTML = '';
                 allSubjects.forEach(subject => {
-                    const subjectQuestions = allQuestions.filter(q => q.subjectId === subject.name);
+                    const subjectQuestions = allQuestions.filter(q => q.subjectid === subject.id); 
                     const card = document.createElement('div');
-                    card.className = 'bg-white p-5 rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer flex flex-col';
+
+                    // Removed all 'dark:' classes
+                    const cardClasses = 'p-5 rounded-xl bg-white border border-gray-300 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer flex flex-col';
+
+                    card.className = cardClasses;
                     card.dataset.subjectId = subject.id;
                     card.innerHTML = `
                         <div class="flex-grow">
-                            <h3 class="font-bold text-xl text-slate-900">${subject.name}</h3>
-                            <p class="text-sm text-slate-500 mt-1">${subject.tagline}</p>
+                            <h3 class="font-bold text-xl text-gray-800">${subject.name}</h3>
+                            <p class="text-sm text-gray-500 mt-1">${subject.tagline || ""}</p>
                         </div>
-                        <div class="text-sm mt-4 pt-4 border-t border-slate-200 text-slate-600">
+                        <div class="text-sm mt-4 pt-4 border-t border-gray-200 text-gray-500 flex justify-between items-center">
                              <p class="font-medium">${subjectQuestions.length} Questions Available</p>
                         </div>
                     `;
@@ -360,20 +367,52 @@
                 questionTopic.textContent = question.topic || "General";
                 optionsContainer.innerHTML = '';
 
-                question.option.choices.forEach((option, index) => {
+                question.options.forEach((option, index) => {
                     const isSelected = state.selectedOption === index;
+                    const isAnsweredState = state.status === 'answered' || state.status === 'answered-marked';
                     const optionButton = document.createElement('button');
-                    optionButton.className = `w-full text-left p-4 border rounded-lg transition-colors text-slate-700 ${isSelected ? 'bg-blue-100 border-blue-500 font-semibold' : 'bg-white border-slate-300 hover:bg-slate-50'}`;
+
+                    // Base classes for all option buttons
+                    let buttonClasses = 'w-full text-left p-4 border rounded-lg transition-colors option-button-base';
+
+                    if (isAnsweredState && currentMode === 'practice') {
+                        // PRACTICE MODE: Answer is final, show correct/incorrect
+                        optionButton.disabled = true;
+
+                        if (index === question.answer) {
+                            // Correct Answer: Green highlight
+                            buttonClasses += ' bg-green-100 border-green-500 font-semibold ring-2 ring-green-500';
+                        } else if (isSelected) {
+                            // User's Incorrect Selection: Red highlight
+                            buttonClasses += ' bg-red-100 border-red-500 font-semibold ring-2 ring-red-500';
+                        } else {
+                            // Unselected Options
+                            buttonClasses += ' bg-white border-gray-300 cursor-default';
+                        }
+                    } else {
+                        // MOCK MODE or Practice mode (not yet answered): Show selection state
+                        if (isSelected) {
+                            // Currently Selected Option: Blue highlight
+                            buttonClasses += ' bg-blue-100 border-blue-500 font-semibold ring-2 ring-blue-500';
+                        } else {
+                            // Unselected Option: Hover state
+                            buttonClasses += ' bg-white border-gray-300 hover:bg-gray-50';
+                        }
+                        // Add click listener only if it's not disabled
+                        optionButton.addEventListener('click', () => selectOption(index));
+                    }
+
+                    optionButton.className = buttonClasses.trim();
                     optionButton.textContent = option;
-                    optionButton.addEventListener('click', () => selectOption(index));
                     optionsContainer.appendChild(optionButton);
                 });
-                
+
+
                 currentQNumber.textContent = currentQuestionIndex + 1;
                 totalQNumber.textContent = currentQuestions.length;
                 updatePalette();
             }
-            
+
             function updatePalette() {
                 questionPalette.innerHTML = '';
                 testState.forEach((state, index) => {
@@ -406,9 +445,9 @@
                     switchView('subjectDetail');
                 }
             }
-            
+
             function showMockModal() {
-                const subjectQuestions = allQuestions.filter(q => q.subjectId === currentSubject.id);
+                const subjectQuestions = allQuestions.filter(q => q.subjectid === currentSubject.id);
                 totalQuestionsCount.textContent = subjectQuestions.length;
                 Array.from(questionCountSelect.options).forEach(opt => {
                     opt.disabled = parseInt(opt.value) > subjectQuestions.length;
@@ -418,9 +457,8 @@
 
             function startTest(mode, questionCount = 0, timeLimit = 0) {
                 currentMode = mode;
-                let subjectQuestions = allQuestions.filter(q => q.subjectId === currentSubject.id);
+                let subjectQuestions = allQuestions.filter(q => q.subjectid === currentSubject.id);
 
-                // Reset timer and submit button visibility each time a test starts
                 timerEl.parentElement.classList.remove('hidden');
                 submitTestBtn.classList.remove('hidden');
 
@@ -431,60 +469,76 @@
                 } else { // practice mode
                     currentQuestions = subjectQuestions;
                     testTitle.textContent = `${currentSubject.name} Practice`;
-                    // Hide timer and submit button specifically for practice mode
                     timerEl.parentElement.classList.add('hidden');
                     submitTestBtn.classList.add('hidden');
                 }
 
                 currentQuestionIndex = 0;
-                // Initialize test state for the current set of questions
                 testState = currentQuestions.map(() => ({
-                    status: 'not-visited', // valid statuses: not-visited, not-answered, answered, marked, answered-marked
+                    status: 'not-visited', 
                     selectedOption: null
                 }));
 
-                // This check ensures 'testState' has at least one element before we try to access it
                 if(currentQuestions.length > 0) {
-                    // Mark the first question as the current one to be answered
-                    testState[0].status = 'not-answered'; 
+                    testState[0].status = 'not-answered';
                     renderQuestion();
                     switchView('test');
                 } else {
-                    // If a subject has no questions, show an alert and go back.
                     showConfirmation("No questions available for this subject.", () => switchView('subjectDetail'), true);
                 }
             }
 
             function selectOption(optionIndex) {
                 testState[currentQuestionIndex].selectedOption = optionIndex;
-                if(testState[currentQuestionIndex].status === 'marked'){
-                    testState[currentQuestionIndex].status = 'answered-marked';
-                } else {
+                if(currentMode === 'practice') {
+                    const question = currentQuestions[currentQuestionIndex];
+                    if (optionIndex === question.answer) {
+                        feedbackMessage.textContent = "Correct! Great job.";
+                        // Removed dark mode classes
+                        feedbackMessage.className = "p-3 rounded-lg my-4 text-sm font-medium bg-green-100 text-green-700";
+                    } else {
+                        feedbackMessage.textContent = `Incorrect. The correct answer was: ${question.options[question.answer]}.`;
+                        // Removed dark mode classes
+                        feedbackMessage.className = "p-3 rounded-lg my-4 text-sm font-medium bg-red-100 text-red-700";
+                    }
+                    feedbackMessage.classList.remove('hidden');
                     testState[currentQuestionIndex].status = 'answered';
+                    renderQuestion();
+                } else {
+                    if(testState[currentQuestionIndex].status === 'marked'){
+                        testState[currentQuestionIndex].status = 'answered-marked';
+                    } else {
+                        testState[currentQuestionIndex].status = 'answered';
+                    }
+                    renderQuestion();
                 }
-                renderQuestion(); // Re-render to show selection
             }
-            
+
             function handleNext() {
+                feedbackMessage.classList.add('hidden');
+
                 if (currentQuestionIndex < currentQuestions.length - 1) {
                     jumpToQuestion(currentQuestionIndex + 1);
+                } else if (currentMode === 'mock') {
+                    showConfirmation("You are at the last question. Do you want to submit?", submitTest);
                 } else {
-                    // At the last question, maybe loop or show a message
-                    showConfirmation("You are at the last question. Do you want to submit?", () => submitTest());
+                     showConfirmation("You have reached the end of the practice questions.", () => jumpToQuestion(0), true);
                 }
             }
-            
+
             function jumpToQuestion(index) {
                 currentQuestionIndex = index;
-                if(testState[currentQuestionIndex].status === 'not-visited') {
+                feedbackMessage.classList.add('hidden');
+
+                if(testState[currentQuestionIndex].status === 'not-visited' && currentMode === 'mock') {
                     testState[currentQuestionIndex].status = 'not-answered';
                 }
                 renderQuestion();
             }
-            
+
             function handleMarkForReview() {
                 const state = testState[currentQuestionIndex];
-                if (state.status === 'answered' || state.status === 'answered-marked') {
+                if (state.selectedOption !== null) {
                     state.status = 'answered-marked';
                 } else {
                     state.status = 'marked';
@@ -495,6 +549,8 @@
             function handleClearResponse() {
                 const state = testState[currentQuestionIndex];
                 state.selectedOption = null;
+                feedbackMessage.classList.add('hidden');
+
                 if(state.status === 'answered-marked') {
                     state.status = 'marked';
                 } else if (state.status !== 'marked') {
@@ -502,22 +558,25 @@
                 }
                 renderQuestion();
             }
-            
+
             function startTimer(minutes) {
                 let seconds = minutes * 60;
+                if (timerInterval) clearInterval(timerInterval);
+
                 timerInterval = setInterval(() => {
                     seconds--;
                     const min = Math.floor(seconds / 60).toString().padStart(2, '0');
                     const sec = (seconds % 60).toString().padStart(2, '0');
                     timerEl.textContent = `${min}:${sec}`;
+
                     if (seconds <= 0) {
                         clearInterval(timerInterval);
                         submitTest();
                     }
                 }, 1000);
             }
-                        
-            async function submitTest() { // Make the function async
+
+            async function submitTest() {
                 clearInterval(timerInterval);
                 let correctAnswers = 0;
                 let incorrectAnswers = 0;
@@ -526,7 +585,7 @@
                 testState.forEach((state, index) => {
                     if (state.selectedOption === null) {
                         unattempted++;
-                    } else if (state.selectedOption === currentQuestions[index].option.answer) {
+                    } else if (state.selectedOption === currentQuestions[index].answer) {
                         correctAnswers++;
                     } else {
                         incorrectAnswers++;
@@ -539,34 +598,15 @@
                 resultsIncorrect.textContent = incorrectAnswers;
                 resultsUnattempted.textContent = unattempted;
 
-                // --- NEW: Save results to Supabase ---
-                try {
-                    const { error } = await supabaseClient.from('test_results').insert({
-                        subject_id: currentSubject.id,
-                        score: score,
-                        correct_answers: correctAnswers,
-                        incorrect_answers: incorrectAnswers,
-                        unattempted: unattempted,
-                        total_questions: currentQuestions.length
-                    });
-                    if (error) throw error;
-                    console.log('Test result saved successfully!');
-                } catch (error) {
-                    console.error('Error saving test result:', error.message);
-                }
-                // --- END NEW ---
-
                 switchView('results');
             }
 
-            // IMPORTANT: You also need to make the event listener call async
-                     
             function showConfirmation(message, onOk, isAlert = false, onCancel = () => {}) {
                 document.getElementById('confirm-title').textContent = isAlert ? "Alert" : "Confirm";
                 document.getElementById('confirm-message').textContent = message;
                 const okBtn = document.getElementById('confirm-ok-btn');
                 const cancelBtn = document.getElementById('confirm-cancel-btn');
-                
+
                 okBtn.textContent = isAlert ? "OK" : "Submit";
                 cancelBtn.style.display = isAlert ? 'none' : 'inline-flex';
 
@@ -585,7 +625,10 @@
 
             // --- Event Listeners ---
             backToDashboardBtn.addEventListener('click', () => switchView('dashboard'));
-            practiceQuestionsBtn.addEventListener('click', () => startTest('practice', allQuestions.filter(q => q.subjectId === currentSubject.id).length));
+            practiceQuestionsBtn.addEventListener('click', () => {
+                const count = allQuestions.filter(q => q.subjectid === currentSubject.id).length;
+                startTest('practice', count);
+            });
             createMockBtn.addEventListener('click', showMockModal);
 
             cancelMockBtn.addEventListener('click', () => mockModal.classList.add('hidden'));
@@ -595,11 +638,11 @@
                 mockModal.classList.add('hidden');
                 startTest('mock', count, time);
             });
-            
+
             nextQuestionBtn.addEventListener('click', handleNext);
             clearResponseBtn.addEventListener('click', handleClearResponse);
             markReviewBtn.addEventListener('click', handleMarkForReview);
-            submitTestBtn.addEventListener('click', () => showConfirmation("Are you sure you want to submit the test?", () => submitTest()));
+            submitTestBtn.addEventListener('click', () => showConfirmation("Are you sure you want to submit the test?", submitTest));
             resultsBackBtn.addEventListener('click', () => selectSubject(currentSubject.id));
 
             // --- Initial Load ---
