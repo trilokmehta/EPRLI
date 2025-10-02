@@ -341,7 +341,7 @@
                     const cardClasses = 'p-5 rounded-xl bg-white border border-gray-300 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer flex flex-col';
 
                     card.className = cardClasses;
-                    card.dataset.subjectId = subject.id;
+                    card.dataset.subjectid = subject.id;
                     card.innerHTML = `
                         <div class="flex-grow">
                             <h3 class="font-bold text-xl text-gray-800">${subject.name}</h3>
@@ -435,42 +435,42 @@
                 if(views[viewName]) views[viewName].classList.remove('hidden');
             }
 
-           async function selectSubject(subjectId) {
-    // 1. Find the subject object that the user clicked on.
-    currentSubject = allSubjects.find(s => s.id === subjectId);
+           async function selectSubject(subjectid) {
+                // 1. Find the subject object that the user clicked on.
+                currentSubject = allSubjects.find(s => s.id === subjectid);
 
-    if (currentSubject) {
-        subjectTitle.textContent = currentSubject.name;
+                if (currentSubject) {
+                    subjectTitle.textContent = currentSubject.name;
 
-        // 2. IMPORTANT: Create the table name from the subject name.
-        // It takes the name (e.g., "Maths"), makes it lowercase, and adds "_questions".
-        // This creates "questions_maths".
-        const tableName = `questions_${currentSubject.name.toLowerCase().replace(/ /g, '_')}`;
+                    // 2. IMPORTANT: Create the table name from the subject name.
+                    // It takes the name (e.g., "Maths"), makes it lowercase, and adds "_questions".
+                    // This creates "questions_maths".
+                    const tableName = `questions_${currentSubject.name.toLowerCase().replace(/ /g, '_')}`;
 
-        // 3. Let's add a loading message in the console for debugging.
-        console.log(`Attempting to fetch questions from table: ${tableName}`);
-        
-        try {
-            // 4. Fetch questions from the dynamically created table name.
-            const { data, error } = await supabaseClient.from(tableName).select('*');
-            
-            // If there's an error (e.g., table not found), throw it.
-            if (error) throw error;
+                    // 3. Let's add a loading message in the console for debugging.
+                    console.log(`Attempting to fetch questions from table: ${tableName}`);
+                    
+                    try {
+                        // 4. Fetch questions from the dynamically created table name.
+                        const { data, error } = await supabaseClient.from(tableName).select('*');
+                        
+                        // If there's an error (e.g., table not found), throw it.
+                        if (error) throw error;
 
-            // 5. Success! Store the fetched questions in our state variable.
-            allQuestions = data;
-            console.log(`Successfully fetched ${data.length} questions.`);
-            
-            // 6. Proceed to the subject detail view.
-            switchView('subjectDetail');
+                        // 5. Success! Store the fetched questions in our state variable.
+                        allQuestions = data;
+                        console.log(`Successfully fetched ${data.length} questions.`);
+                        
+                        // 6. Proceed to the subject detail view.
+                        switchView('subjectDetail');
 
-        } catch(error) {
-            // 7. If anything went wrong, log the error and show an alert.
-            console.error(`Error fetching questions from ${tableName}:`, error);
-            alert(`Could not load questions for ${currentSubject.name}. Please check if the table '${tableName}' exists and has public read access.`);
-        }
-    }
-}
+                    } catch(error) {
+                        // 7. If anything went wrong, log the error and show an alert.
+                        console.error(`Error fetching questions from ${tableName}:`, error);
+                        alert(`Could not load questions for ${currentSubject.name}. Please check if the table '${tableName}' exists and has public read access.`);
+                    }
+                }
+            }
 
             function showMockModal() {
                 const subjectQuestions = allQuestions.filter(q => q.subjectid === currentSubject.id);
