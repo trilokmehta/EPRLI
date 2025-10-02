@@ -309,35 +309,32 @@
 
             // --- Data Fetching ---
             async function fetchData() {
-                try {
-                    const [subjectsResponse, questionsResponse] = await Promise.all([
-                        supabaseClient.from('subjects').select('*'),
-                        supabaseClient.from('questions').select('*')
-                    ]);
-
-                    if (subjectsResponse.error) throw subjectsResponse.error;
-                    if (questionsResponse.error) throw questionsResponse.error;
-
-                    allSubjects = subjectsResponse.data;
-                    allQuestions = questionsResponse.data;
-
-                    displaySubjects();
-                } catch (error) {
-                    console.error("Failed to fetch data from Supabase:", error);
-                    subjectsGrid.innerHTML = `<p class="col-span-full text-center text-red-500">
-                        Could not load data. Check console (F12) for Supabase errors.
-                    </p>`;
-                } finally {
-                    loadingSpinner.classList.add('hidden');
-                    switchView('dashboard');
-                }
+            try {
+                const { data, error } = await supabaseClient.from('subjects').select('*');
+        
+                if (error) throw error;
+        
+                allSubjects = data;
+                // allQuestions is now initially empty
+                allQuestions = []; 
+        
+                displaySubjects();
+            } catch (error) {
+                console.error("Failed to fetch subjects from Supabase:", error);
+                subjectsGrid.innerHTML = `<p class="col-span-full text-center text-red-500">
+                    Could not load subjects. Check console (F12) for Supabase errors.
+                </p>`;
+            } finally {
+                loadingSpinner.classList.add('hidden');
+                switchView('dashboard');
             }
+        }
 
             // --- UI Rendering ---
             function displaySubjects() {
                 subjectsGrid.innerHTML = '';
                 allSubjects.forEach(subject => {
-                    const subjectQuestions = allQuestions.filter(q => q.subjectid === subject.id); 
+                   // const subjectQuestions = allQuestions.filter(q => q.subjectid === subject.id); 
                     const card = document.createElement('div');
 
                     // Removed all 'dark:' classes
@@ -351,7 +348,7 @@
                             <p class="text-sm text-gray-500 mt-1">${subject.tagline || ""}</p>
                         </div>
                         <div class="text-sm mt-4 pt-4 border-t border-gray-200 text-gray-500 flex justify-between items-center">
-                             <p class="font-medium">${subjectQuestions.length} Questions Available</p>
+                             <p class="font-medium">${subject.question_count || 0} Questions Available</p>
                         </div>
                     `;
                     card.addEventListener('click', () => selectSubject(subject.id));
@@ -438,13 +435,36 @@
                 if(views[viewName]) views[viewName].classList.remove('hidden');
             }
 
-            function selectSubject(subjectId) {
-                currentSubject = allSubjects.find(s => s.id === subjectId);
-                if (currentSubject) {
-                    subjectTitle.textContent = currentSubject.name;
+            async function selectSubject(subjectId) {
+            currentSubject = allSubjects.find(s => s.id === subjectId);
+            if (currentSubject) {
+                subjectTitle.textContent = currentSubject.name;
+        
+                // Create the table name from the subject name
+                // Example: "Physics" -> "questions_physics"
+                const tableName = `questions_${currentSubject.name.toLowerCase().replace(' ', '')}`;
+        
+                // Show a temporary loading state if you want
+                console.log(`Fetching questions from table: ${tableName}`);
+                
+                try {
+                    // Fetch questions for ONLY this subject
+                    const { data, error } = await supabaseClient.from(tableName).select('*');
+                    if (error) throw error;
+        
+                    // Now, update the global allQuestions variable
+                    allQuestions = data;
+                    
+                    // Proceed to the next view
                     switchView('subjectDetail');
+        
+                } catch(error) {
+                    console.error(`Could not fetch questions from ${tableName}:`, error);
+                    // Show an error to the user
+                    alert(`Sorry, we couldn't load the questions for ${currentSubject.name}.`);
                 }
             }
+        }
 
             function showMockModal() {
                 const subjectQuestions = allQuestions.filter(q => q.subjectid === currentSubject.id);
@@ -457,7 +477,7 @@
 
             function startTest(mode, questionCount = 0, timeLimit = 0) {
                 currentMode = mode;
-                let subjectQuestions = allQuestions.filter(q => q.subjectid === currentSubject.id);
+                    let subjectQuestions = allQuestions; 
 
                 timerEl.parentElement.classList.remove('hidden');
                 submitTestBtn.classList.remove('hidden');
