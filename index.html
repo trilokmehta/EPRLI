@@ -435,36 +435,42 @@
                 if(views[viewName]) views[viewName].classList.remove('hidden');
             }
 
-            async function selectSubject(subjectId) {
-            currentSubject = allSubjects.find(s => s.id === subjectId);
-            if (currentSubject) {
-                subjectTitle.textContent = currentSubject.name;
+           async function selectSubject(subjectId) {
+    // 1. Find the subject object that the user clicked on.
+    currentSubject = allSubjects.find(s => s.id === subjectId);
+
+    if (currentSubject) {
+        subjectTitle.textContent = currentSubject.name;
+
+        // 2. IMPORTANT: Create the table name from the subject name.
+        // It takes the name (e.g., "Maths"), makes it lowercase, and adds "_questions".
+        // This creates "questions_maths".
+        const tableName = `questions_${currentSubject.name.toLowerCase().replace(/ /g, '_')}`;
+
+        // 3. Let's add a loading message in the console for debugging.
+        console.log(`Attempting to fetch questions from table: ${tableName}`);
         
-                // Create the table name from the subject name
-                // Example: "Physics" -> "questions_physics"
-                const tableName = `questions_${currentSubject.name.toLowerCase().replace(' ', '')}`;
-        
-                // Show a temporary loading state if you want
-                console.log(`Fetching questions from table: ${tableName}`);
-                
-                try {
-                    // Fetch questions for ONLY this subject
-                    const { data, error } = await supabaseClient.from(tableName).select('*');
-                    if (error) throw error;
-        
-                    // Now, update the global allQuestions variable
-                    allQuestions = data;
-                    
-                    // Proceed to the next view
-                    switchView('subjectDetail');
-        
-                } catch(error) {
-                    console.error(`Could not fetch questions from ${tableName}:`, error);
-                    // Show an error to the user
-                    alert(`Sorry, we couldn't load the questions for ${currentSubject.name}.`);
-                }
-            }
+        try {
+            // 4. Fetch questions from the dynamically created table name.
+            const { data, error } = await supabaseClient.from(tableName).select('*');
+            
+            // If there's an error (e.g., table not found), throw it.
+            if (error) throw error;
+
+            // 5. Success! Store the fetched questions in our state variable.
+            allQuestions = data;
+            console.log(`Successfully fetched ${data.length} questions.`);
+            
+            // 6. Proceed to the subject detail view.
+            switchView('subjectDetail');
+
+        } catch(error) {
+            // 7. If anything went wrong, log the error and show an alert.
+            console.error(`Error fetching questions from ${tableName}:`, error);
+            alert(`Could not load questions for ${currentSubject.name}. Please check if the table '${tableName}' exists and has public read access.`);
         }
+    }
+}
 
             function showMockModal() {
                 const subjectQuestions = allQuestions.filter(q => q.subjectid === currentSubject.id);
