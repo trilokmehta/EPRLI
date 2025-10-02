@@ -19,7 +19,7 @@
             background-color: var(--color-light-bg);
         }
         .fade-in {
-            animation: fadeIn 0.5s ease-in-out forwards;
+            animation: fadeIn 1s ease-in-out forwards;
         }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
@@ -239,6 +239,8 @@
     </div>
 
 
+
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
 
@@ -307,28 +309,32 @@
             let score = 0, timerInterval = null;
 
 
-            // --- Data Fetching ---
-            async function fetchData() {
-            try {
-                const { data, error } = await supabaseClient.from('subjects').select('*');
-        
-                if (error) throw error;
-        
-                allSubjects = data;
-                // allQuestions is now initially empty
-                allQuestions = []; 
-        
-                displaySubjects();
-            } catch (error) {
-                console.error("Failed to fetch subjects from Supabase:", error);
-                subjectsGrid.innerHTML = `<p class="col-span-full text-center text-red-500">
-                    Could not load subjects. Check console (F12) for Supabase errors.
-                </p>`;
-            } finally {
-                loadingSpinner.classList.add('hidden');
-                switchView('dashboard');
+            // Function to fetch the count for each subject (Defined here)
+            async function updateQuestionCounts() {
+                for (const subject of allSubjects) {
+                    try {
+                        const tableName = `questions_${subject.name.toLowerCase().replace(/ /g, '_')}`;
+                        
+                        // Use count to get the number of rows without retrieving all data
+                        const { count, error } = await supabaseClient
+                            .from(tableName)
+                            .select('id', { count: 'exact', head: true });
+
+                        if (error) throw error;
+
+                        const countElement = document.getElementById(`count-${subject.id}`);
+                        if (countElement) {
+                            countElement.textContent = count;
+                            subject.question_count = count; 
+                        }
+                    } catch (e) {
+                        console.warn(`Could not fetch count for ${subject.name}. Assuming 0.`, e.message);
+                        const countElement = document.getElementById(`count-${subject.id}`);
+                        if (countElement) countElement.textContent = '0';
+                    }
+                }
             }
-        }
+
 
             // --- UI Rendering ---
             function displaySubjects() {
@@ -343,14 +349,14 @@
                     card.className = cardClasses;
                     card.dataset.subjectid = subject.id;
                     card.innerHTML = `
-                        <div class="flex-grow">
-                            <h3 class="font-bold text-xl text-gray-800">${subject.name}</h3>
-                            <p class="text-sm text-gray-500 mt-1">${subject.tagline || ""}</p>
+                        <div class="flex items-center mb-3">
+                            <h3 class="text-xl font-bold text-gray-800">${subject.name}</h3>
                         </div>
-                        <div class="text-sm mt-4 pt-4 border-t border-gray-200 text-gray-500 flex justify-between items-center">
-                             <p class="font-medium">${subject.question_count || 0} Questions Available</p>
+                        <p class="text-gray-500 mb-4 flex-grow">${subject.description || 'Practice questions and mock tests for this subject.'}</p>
+                        <div class="text-sm pt-4 border-t border-gray-200 text-gray-500 flex justify-between items-center">
+                            <p class="font-medium"><span id="count-${subject.id}">Loading...</span> Questions Available</p>
                         </div>
-                    `;
+                    `; // <--- MODIFIED SECTION HERE
                     card.addEventListener('click', () => selectSubject(subject.id));
                     subjectsGrid.appendChild(card);
                 });
@@ -473,7 +479,7 @@
             }
 
             function showMockModal() {
-                const subjectQuestions = allQuestions.filter(q => q.subjectid === currentSubject.id);
+                const subjectQuestions = allQuestions; 
                 totalQuestionsCount.textContent = subjectQuestions.length;
                 Array.from(questionCountSelect.options).forEach(opt => {
                     opt.disabled = parseInt(opt.value) > subjectQuestions.length;
@@ -483,7 +489,7 @@
 
             function startTest(mode, questionCount = 0, timeLimit = 0) {
                 currentMode = mode;
-                    let subjectQuestions = allQuestions; 
+                let subjectQuestions = allQuestions; 
 
                 timerEl.parentElement.classList.remove('hidden');
                 submitTestBtn.classList.remove('hidden');
@@ -652,7 +658,7 @@
             // --- Event Listeners ---
             backToDashboardBtn.addEventListener('click', () => switchView('dashboard'));
             practiceQuestionsBtn.addEventListener('click', () => {
-                const count = allQuestions.filter(q => q.subjectid === currentSubject.id).length;
+                const count = allQuestions.length;
                 startTest('practice', count);
             });
             createMockBtn.addEventListener('click', showMockModal);
@@ -672,6 +678,28 @@
             resultsBackBtn.addEventListener('click', () => selectSubject(currentSubject.id));
 
             // --- Initial Load ---
+            
+            async function fetchData() {
+                try {
+                    const { data, error } = await supabaseClient.from('subjects').select('*');
+
+                    if (error) throw error;
+
+                    allSubjects = data;
+                    allQuestions = []; 
+
+                    displaySubjects();
+                    await updateQuestionCounts();
+                } catch (error) { 
+                    console.error("Failed to fetch subjects from Supabase:", error);
+                    subjectsGrid.innerHTML = `<p class="col-span-full text-center text-red-500">
+                        Could not load subjects. Check console (F12) for Supabase errors.
+                    </p>`;
+                } finally { 
+                    loadingSpinner.classList.add('hidden');
+                    switchView('dashboard');
+                } 
+            }
             fetchData();
         });
     </script>
