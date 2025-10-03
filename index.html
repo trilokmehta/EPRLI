@@ -81,7 +81,9 @@
                         <span class="font-extrabold text-2xl" style="color: var(--color-primary);">CUET Pro</span>
                     </div>
                     <div class="flex items-center">
-                        <span class="mr-3 font-semibold text-gray-700 hidden sm:block">Aarav Sharma</span>
+                        <button id="header-mock-btn" class="hidden sm:inline-flex items-center px-4 py-2 mr-4 text-sm font-medium text-white rounded-lg hover:opacity-90 transition-colors" style="background-color: var(--color-primary);">
+                            Create Mock Test
+                        </button>
                         <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-lg" style="background-color: var(--color-primary);">
                             A
                         </div>
@@ -267,6 +269,7 @@
             const backToDashboardBtn = document.getElementById('back-to-dashboard');
             const createMockBtn = document.getElementById('create-mock-btn');
             const practiceQuestionsBtn = document.getElementById('practice-questions-btn');
+            const headerMockBtn = document.getElementById('header-mock-btn'); // <-- NEW ELEMENT
 
             // Modals
             const mockModal = document.getElementById('mock-modal');
@@ -435,6 +438,13 @@
             function switchView(viewName) {
                 Object.values(views).forEach(v => v.classList.add('hidden'));
                 if(views[viewName]) views[viewName].classList.remove('hidden');
+                
+                // Toggle Header Mock Button Visibility
+                if (viewName === 'dashboard' || viewName === 'subjectDetail') {
+                    headerMockBtn.classList.remove('hidden');
+                } else {
+                    headerMockBtn.classList.add('hidden');
+                }
             }
 
            async function selectSubject(subjectid) {
@@ -474,6 +484,26 @@
 
             function showMockModal() {
                 const subjectQuestions = allQuestions; 
+                if (currentSubject === null) {
+                    // This case handles a click on the header button from the dashboard
+                    // where allQuestions is not yet specific to a subject.
+                    // To handle this, we need to know which subject the user intends to mock.
+                    // For now, let's only allow the mock modal if a subject has been selected (i.e., on the subject detail view or a mock in progress)
+                    // Given the new `switchView` logic, this button is only visible on Dashboard or SubjectDetail.
+                    // On the Dashboard, we don't have a `currentSubject` selected.
+                    // A quick fix is to disable the button on the main dashboard view, 
+                    // or pop up an alert if a subject isn't selected. 
+                    // Let's rely on the switchView logic for now, assuming the user will select a subject first.
+                    
+                    if (subjectQuestions.length === 0 && currentSubject !== null) {
+                        alert("Please select a subject first.");
+                        return;
+                    } else if (currentSubject === null) {
+                         alert("Please select a subject from the dashboard before creating a mock test.");
+                         return;
+                    }
+                }
+                
                 totalQuestionsCount.textContent = subjectQuestions.length;
                 Array.from(questionCountSelect.options).forEach(opt => {
                     opt.disabled = parseInt(opt.value) > subjectQuestions.length;
@@ -656,6 +686,7 @@
                 startTest('practice', count);
             });
             createMockBtn.addEventListener('click', showMockModal);
+            headerMockBtn.addEventListener('click', showMockModal); // <-- NEW LISTENER
 
             cancelMockBtn.addEventListener('click', () => mockModal.classList.add('hidden'));
             startMockBtn.addEventListener('click', () => {
