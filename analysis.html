@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CUET Pro - Advanced Analysis</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- ADDING CHART.JS LIBRARY -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --color-primary: #007AFF; --color-light-bg: #F0F4F7; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--color-light-bg); }
+        .fade-in { animation: fadeIn 1s ease-in-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .tab-btn { transition: all 0.2s ease-in-out; }
+        .tab-btn.active { background-color: var(--color-primary); color: white; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); }
+    </style>
+</head>
+<body class="text-gray-900">
+    <div id="app" class="hidden">
+        <header class="bg-white shadow-md sticky top-0 z-40">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-16">
+                    <a href="home.html" class="font-extrabold text-2xl" style="color: var(--color-primary);">CUET Pro</a>
+                    <div class="flex items-center">
+                        <div id="user-email" class="text-sm text-gray-600 mr-4"></div>
+                        <a href="home.html" class="px-4 py-2 mr-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200">Dashboard</a>
+
+                        <button id="logout-btn" class="px-4 py-2 text-sm font-medium text-white bg-red-500 rounded-lg hover:bg-red-600">Logout</button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="max-w-7xl mx-auto p-4 md:p-6 lg:p-8">
+            <h1 class="text-2xl md:text-3xl font-bold mb-6 text-gray-800">Performance Dashboard</h1>
+
+            <div id="loading-spinner" class="text-center p-10 fade-in">
+                <svg class="animate-spin h-10 w-8 text-gray-500 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                <p class="mt-4 text-gray-600">Crunching the numbers...</p>
+            </div>
+            
+            <div id="analysis-content" class="hidden fade-in space-y-8">
+                <div class="bg-white p-2 rounded-xl shadow-sm flex space-x-2">
+                    <button id="overall-tab-btn" class="tab-btn flex-1 py-2 px-4 font-semibold rounded-lg">Overall Analysis</button>
+                    <button id="subjects-tab-btn" class="tab-btn flex-1 py-2 px-4 font-semibold rounded-lg">Subject-Specific</button>
+                </div>
+
+                <div id="overall-view" class="space-y-8">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div class="bg-white p-5 rounded-xl shadow-sm text-center"><p id="overall-total" class="font-bold text-3xl text-blue-600">0</p><p class="text-sm font-medium text-gray-500 mt-1">Total Questions Answered</p></div>
+                        <div class="bg-white p-5 rounded-xl shadow-sm text-center"><p id="overall-accuracy" class="font-bold text-3xl text-purple-600">0%</p><p class="text-sm font-medium text-gray-500 mt-1">Overall Accuracy</p></div>
+                        <div class="bg-white p-5 rounded-xl shadow-sm text-center"><p id="strongest-subject" class="font-bold text-3xl text-green-600">-</p><p class="text-sm font-medium text-gray-500 mt-1">Strongest Subject</p></div>
+                        <div class="bg-white p-5 rounded-xl shadow-sm text-center"><p id="weakest-subject" class="font-bold text-3xl text-red-600">-</p><p class="text-sm font-medium text-gray-500 mt-1">Weakest Subject</p></div>
+                    </div>
+                    <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
+                        <div class="lg:col-span-3 bg-white p-6 rounded-xl shadow-sm"><h2 class="text-xl font-bold text-gray-800 mb-4">Performance Trend Over Time</h2><div class="h-80"><canvas id="trendsLineChart"></canvas></div></div>
+                        <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm"><Subject Performance class="text-xl font-bold text-gray-800 mb-4">Subject Performance</h2><div id="subject-details-container" class="mt-4 space-y-4 max-h-80 overflow-y-auto pr-2"></div></div>
+                            
+                    </div>
+                </div>
+
+                <div id="subject-specific-view" class="hidden space-y-8">
+    <div class="bg-white p-4 rounded-xl shadow-sm"><h2 class="text-lg font-bold text-gray-800 mb-3">Select Subject</h2><div id="subject-tabs-container" class="flex flex-wrap gap-2"></div></div>
+    <div id="no-data-message" class="hidden text-center py-12"><h3 class="text-xl font-semibold text-gray-700">No Data Yet</h3><p class="text-gray-500 mt-2">Start practicing to see your detailed analysis!</p></div>
+    
+    <div id="subject-analysis" class="hidden space-y-8">
+        <h2 class="text-2xl font-bold text-gray-800">Analysis for <span id="current-subject-name" class="text-blue-600"></span></h2>
+        
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            <div class="bg-white p-5 rounded-xl shadow-sm text-center"><p id="total-answered" class="font-bold text-3xl text-blue-600">0</p><p class="text-sm font-medium text-gray-500 mt-1">Answered</p></div>
+            <div class="bg-white p-5 rounded-xl shadow-sm text-center"><p id="accuracy" class="font-bold text-3xl text-purple-600">0%</p><p class="text-sm font-medium text-gray-500 mt-1">Accuracy</p></div>
+            <div class="bg-white p-5 rounded-xl shadow-sm text-center"><p id="correct-answers" class="font-bold text-3xl text-green-600">0</p><p class="text-sm font-medium text-gray-500 mt-1">Correct</p></div>
+            <div class="bg-white p-5 rounded-xl shadow-sm text-center"><p id="incorrect-answers" class="font-bold text-3xl text-red-600">0</p><p class="text-sm font-medium text-gray-500 mt-1">Incorrect</p></div>
+            <div class="bg-white p-5 rounded-xl shadow-sm text-center border-2 border-dashed"><p id="target-accuracy" class="font-bold text-3xl text-gray-700">85%</p><p class="text-sm font-medium text-gray-500 mt-1">Target Accuracy</p></div>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl shadow-sm"><h2 class="text-xl font-bold text-gray-800 mb-4">Performance Trend</h2><div class="h-72"><canvas id="subjectTrendChart"></canvas></div></div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+           <div class="bg-white p-6 rounded-xl shadow-sm"><h2 class="text-xl font-bold text-gray-800 mb-4">Strongest Topics</h2><div id="strongest-topics" class="space-y-4"></div></div>
+           <div class="bg-white p-6 rounded-xl shadow-sm"><h2 class="text-xl font-bold text-gray-800 mb-4">Weakest Topics</h2><div id="weakest-topics" class="space-y-4"></div></div>
+        </div>
+
+        <div class="grid grid-cols-1 gap-8">
+                <div class="bg-white p-6 rounded-xl shadow-sm"><h2 class="text-xl font-bold text-gray-800 mb-4">Accuracy by Difficulty</h2><div class="h-72 relative"><canvas id="difficultyBarChart"></canvas></div></div>
+        </div>
+    </div>
+</div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://laredtouarpjxmzwvcco.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxhcmVkdG91YXJwanhtend2Y2NvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkzNzkxMjMsImV4cCI6MjA3NDk1NTEyM30.pJR9Nky9eECeyMmNU1tux3VuywX7Cl_zmP7eCf7iZ3I';
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        let currentUser = null, allPerformanceData = [], allSubjects = [];
+        let pieChart = null, lineChart = null, barChart = null, subjectLineChart = null, mistakesChart = null;
+
+        supabaseClient.auth.getSession().then(({ data: { session } }) => {
+            if (!session) { window.location.href = '/login.html'; } 
+            else {
+                currentUser = session.user;
+                document.getElementById('user-email').textContent = currentUser.email;
+                document.getElementById('app').classList.remove('hidden');
+                loadInitialData();
+            }
+        });
+
+        const overallTab = document.getElementById('overall-tab-btn'), subjectsTab = document.getElementById('subjects-tab-btn'), overallView = document.getElementById('overall-view'), subjectSpecificView = document.getElementById('subject-specific-view');
+        overallTab.addEventListener('click', () => { overallTab.classList.add('active'); subjectsTab.classList.remove('active'); overallView.classList.remove('hidden'); subjectSpecificView.classList.add('hidden'); });
+        subjectsTab.addEventListener('click', () => { subjectsTab.classList.add('active'); overallTab.classList.remove('active'); subjectSpecificView.classList.remove('hidden'); overallView.classList.add('hidden'); });
+        document.getElementById('logout-btn').addEventListener('click', async () => { 
+        await supabaseClient.auth.signOut(); 
+        window.location.href = '/index.html'; // <- CORRECT
+    });
+
+        async function loadInitialData() {
+            try {
+                const [performanceRes, subjectsRes] = await Promise.all([
+                    supabaseClient.from('user_question_status').select('subject_id, status, topic, difficulty, created_at').eq('user_id', currentUser.id),
+                    supabaseClient.from('subjects').select('id, name')
+                ]);
+                if (performanceRes.error) throw performanceRes.error;
+                if (subjectsRes.error) throw subjectsRes.error;
+                allPerformanceData = performanceRes.data;
+                allSubjects = subjectsRes.data;
+                if (allPerformanceData.length > 0) {
+                    renderOverallAnalysis();
+                    renderSubjectTabs();
+                    overallTab.click();
+                } else {
+                    document.getElementById('no-data-message').classList.remove('hidden');
+                    document.getElementById('subject-analysis').classList.add('hidden');
+                    subjectsTab.click();
+                }
+            } catch (error) { console.error("Error loading analysis data:", error); } 
+            finally { document.getElementById('loading-spinner').classList.add('hidden'); document.getElementById('analysis-content').classList.remove('hidden'); }
+        }
+
+        function getAccuracy(data) {
+            if (!data || data.length === 0) return { correct: 0, total: 0, accuracy: 0 };
+            const total = data.length;
+            const correct = data.filter(d => d.status === 'correct').length;
+            return { correct, total, accuracy: Math.round((correct / total) * 100) };
+        }
+
+        function renderOverallAnalysis() {
+            const overallStats = getAccuracy(allPerformanceData);
+            document.getElementById('overall-total').textContent = overallStats.total;
+            document.getElementById('overall-accuracy').textContent = `${overallStats.accuracy}%`;
+            
+            const subjectAccuracies = allSubjects.map(subject => {
+                const subjectRecords = allPerformanceData.filter(d => d.subject_id === subject.id);
+                return { name: subject.name, ...getAccuracy(subjectRecords) };
+            }).filter(s => s.total > 0);
+
+            if(subjectAccuracies.length > 0) {
+                subjectAccuracies.sort((a, b) => b.accuracy - a.accuracy);
+                document.getElementById('strongest-subject').textContent = subjectAccuracies[0].name;
+                document.getElementById('weakest-subject').textContent = subjectAccuracies[subjectAccuracies.length - 1].name;
+            }
+            // --- ADD THIS NEW BLOCK ---
+const container = document.getElementById('subject-details-container');
+if (subjectAccuracies.length > 0) {
+    const subjectDetailsHtml = subjectAccuracies.map(subject => {
+        const color = subject.accuracy >= 75 ? 'bg-green-500' : subject.accuracy >= 40 ? 'bg-yellow-500' : 'bg-red-500';
+        return `
+            <div>
+                <div class="flex justify-between items-center mb-1">
+                    <span class="text-base font-medium text-gray-700">${subject.name}</span>
+                    <span class="text-sm font-medium text-gray-500">${subject.correct}/${subject.total} (${subject.accuracy}%)</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2">
+                    <div class="${color} h-2 rounded-full" style="width: ${subject.accuracy}%"></div>
+                </div>
+            </div>
+        `;
+    }).join('');
+    container.innerHTML = subjectDetailsHtml;
+} else {
+    container.innerHTML = '<p class="text-gray-500 text-center">No subject data to display yet.</p>';
+}
+// --- END OF NEW BLOCK ---
+
+            const trendData = allPerformanceData.reduce((acc, item) => {
+                const date = new Date(item.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+                if (!acc[date]) acc[date] = [];
+                acc[date].push(item);
+                return acc;
+            }, {});
+            const sortedDates = Object.keys(trendData).sort((a, b) => new Date(a) - new Date(b));
+            const trendAccuracies = sortedDates.map(date => getAccuracy(trendData[date]).accuracy);
+
+                        renderLineChart(sortedDates, trendAccuracies);
+        }
+
+        function renderSubjectTabs() {
+            const container = document.getElementById('subject-tabs-container');
+            const attemptedSubjectIds = [...new Set(allPerformanceData.map(d => d.subject_id))];
+            if(attemptedSubjectIds.length === 0) return;
+            container.innerHTML = attemptedSubjectIds.map(id => {
+                const subject = allSubjects.find(s => s.id === id);
+                return `<button class="tab-btn subject-tab-btn py-2 px-4 font-semibold rounded-lg bg-gray-200 text-gray-700" data-subject-id="${id}">${subject.name}</button>`;
+            }).join('');
+            document.querySelectorAll('.subject-tab-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    document.querySelectorAll('.subject-tab-btn').forEach(b => b.classList.remove('active'));
+                    e.target.classList.add('active');
+                    renderSubjectAnalysis(e.target.dataset.subjectId);
+                });
+            });
+            if (container.firstChild) container.firstChild.click();
+        }
+
+        // REPLACE your current renderSubjectAnalysis function with this one
+
+function renderSubjectAnalysis(subjectId) {
+    document.getElementById('subject-analysis').classList.remove('hidden');
+    const subjectData = allPerformanceData.filter(d => d.subject_id == subjectId);
+    const subject = allSubjects.find(s => s.id == subjectId);
+    
+    // Render KPI Cards
+    const stats = getAccuracy(subjectData);
+    document.getElementById('current-subject-name').textContent = subject.name;
+    document.getElementById('total-answered').textContent = stats.total;
+    document.getElementById('accuracy').textContent = `${stats.accuracy}%`;
+    document.getElementById('correct-answers').textContent = stats.correct;
+    document.getElementById('incorrect-answers').textContent = stats.total - stats.correct;
+
+    // Render Time Trend Chart for this Subject
+    renderSubjectTimeTrend(subjectData);
+
+    // Group data for topic lists
+    const groupedByTopic = subjectData.reduce((acc, item) => {
+        const key = item.topic || 'General';
+        if (!acc[key]) acc[key] = []; acc[key].push(item); return acc;
+    }, {});
+    const topicAccuracies = Object.entries(groupedByTopic).map(([name, data]) => ({ name, ...getAccuracy(data) }));
+    renderTopicLists(topicAccuracies);
+
+    // Group data for difficulty chart
+    const groupedByDifficulty = subjectData.reduce((acc, item) => {
+        const key = item.difficulty || 'Unknown';
+        if (!acc[key]) acc[key] = []; acc[key].push(item); return acc;
+    }, {});
+    
+    // Prepare data specifically for the old difficulty chart (accuracy percentages)
+    const difficultyAccuracies = ['Easy', 'Medium', 'Hard'].map(d => {
+        const data = groupedByDifficulty[d] || [];
+        return getAccuracy(data).accuracy;
+    });
+    renderDifficultyChart(difficultyAccuracies);
+}
+
+        function renderTopicLists(topicData) {
+            const strongestContainer = document.getElementById('strongest-topics');
+            const weakestContainer = document.getElementById('weakest-topics');
+            
+            const strongest = topicData.slice(0, 5);
+            const weakest = [...topicData].sort((a,b) => a.accuracy - b.accuracy).slice(0, 5);
+
+            const renderHTML = (data) => data.map(topic => {
+                const color = topic.accuracy >= 75 ? 'bg-green-500' : topic.accuracy >= 40 ? 'bg-yellow-500' : 'bg-red-500';
+                return `<div><div class="flex justify-between items-center mb-1"><span class="text-base font-medium text-gray-700">${topic.name}</span><span class="text-sm font-medium text-gray-500">${topic.correct}/${topic.total} (${topic.accuracy}%)</span></div><div class="w-full bg-gray-200 rounded-full h-2"><div class="${color} h-2 rounded-full" style="width: ${topic.accuracy}%"></div></div></div>`;
+            }).join('');
+
+            strongestContainer.innerHTML = renderHTML(strongest);
+            weakestContainer.innerHTML = renderHTML(weakest);
+        }
+        function renderSubjectTimeTrend(subjectData) {
+    const trendData = subjectData.reduce((acc, item) => {
+        const date = new Date(item.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+        if (!acc[date]) acc[date] = []; acc[date].push(item); return acc;
+    }, {});
+    const sortedDates = Object.keys(trendData).sort((a, b) => new Date(a) - new Date(b));
+    const trendAccuracies = sortedDates.map(date => getAccuracy(trendData[date]).accuracy);
+    
+    // This is a special version of renderLineChart for the subject tab
+    const ctx = document.getElementById('subjectTrendChart').getContext('2d');
+    if (subjectLineChart) subjectLineChart.destroy();
+    subjectLineChart = new Chart(ctx, {
+        type: 'line',
+        data: { labels: sortedDates, datasets: [{ label: 'Accuracy %', data: trendAccuracies, borderColor: 'rgba(0, 122, 255, 1)', backgroundColor: 'rgba(0, 122, 255, 0.1)', fill: true, tension: 0.3 }] },
+        options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, max: 100 } } }
+    });
+}
+// ADD THIS NEW FUNCTION to your script
+
+function renderSubjectTimeTrend(subjectData) {
+    const trendData = subjectData.reduce((acc, item) => {
+        const date = new Date(item.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+        if (!acc[date]) acc[date] = []; acc[date].push(item); return acc;
+    }, {});
+    const sortedDates = Object.keys(trendData).sort((a, b) => new Date(a) - new Date(b));
+    const trendAccuracies = sortedDates.map(date => getAccuracy(trendData[date]).accuracy);
+    
+    const ctx = document.getElementById('subjectTrendChart').getContext('2d');
+    if (subjectLineChart) subjectLineChart.destroy();
+    subjectLineChart = new Chart(ctx, {
+        type: 'line',
+        data: { 
+            labels: sortedDates, 
+            datasets: [{ 
+                label: 'Accuracy %', 
+                data: trendAccuracies, 
+                borderColor: 'rgba(0, 122, 255, 1)', 
+                backgroundColor: 'rgba(0, 122, 255, 0.1)', 
+                fill: true, 
+                tension: 0.3 
+            }] 
+        },
+        options: { 
+            responsive: true, 
+            maintainAspectRatio: false, 
+            scales: { y: { beginAtZero: true, max: 100 } } 
+        }
+    });
+}
+
+function renderMistakesChart(topicData) {
+    const sortedByMistakes = [...topicData].sort((a,b) => (b.total-b.correct) - (a.total-a.correct)).slice(0, 7);
+    const ctx = document.getElementById('mistakesBarChart').getContext('2d');
+    if(mistakesChart) mistakesChart.destroy();
+    mistakesChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: sortedByMistakes.map(t => t.name),
+            datasets: [{ label: 'Number of Incorrect Answers', data: sortedByMistakes.map(t => t.total - t.correct), backgroundColor: '#EF4444'}]
+        },
+        options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y', plugins: { legend: {display: false} }, scales: { x: { beginAtZero: true } } }
+    });
+}
+        
+        // REPLACE your current renderDifficultyChart function with this one
+
+function renderDifficultyChart(data) {
+    const ctx = document.getElementById('difficultyBarChart').getContext('2d');
+    if (barChart) barChart.destroy();
+    barChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Easy', 'Medium', 'Hard'],
+            datasets: [{ 
+                label: 'Accuracy %', 
+                data, 
+                backgroundColor: ['#10B981', '#F59E0B', '#EF4444'] 
+            }]
+        },
+        options: { 
+            responsive: true, 
+            maintainAspectRatio: false, 
+            indexAxis: 'y', 
+            scales: { x: { beginAtZero: true, max: 100 } }, 
+            plugins: { legend: { display: false } } 
+        }
+    });
+}
+        
+        function renderPieChart(labels, data) {
+            const ctx = document.getElementById('subjectsPieChart').getContext('2d');
+            if (pieChart) pieChart.destroy();
+            pieChart = new Chart(ctx, {
+                type: 'pie',
+                data: { labels, datasets: [{ label: 'Accuracy %', data, backgroundColor: ['#3B82F6', '#8B5CF6', '#10B981', '#F59E0B', '#EF4444', '#14B8A6'] }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right' } } }
+            });
+        }
+        
+        function renderLineChart(labels, data) {
+            const ctx = document.getElementById('trendsLineChart').getContext('2d');
+            if (lineChart) lineChart.destroy();
+            lineChart = new Chart(ctx, {
+                type: 'line',
+                data: { labels, datasets: [{ label: 'Accuracy %', data, borderColor: 'rgba(0, 122, 255, 1)', backgroundColor: 'rgba(0, 122, 255, 0.1)', fill: true, tension: 0.3 }] },
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, max: 100 } } }
+            });
+        }
+    </script>
+</body>
+</html>
+
