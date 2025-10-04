@@ -46,14 +46,24 @@
             border: 2px solid #3498db;
             transform: scale(1.1);
         }
-        .option-button:hover {
+        .option-button:hover:not(:disabled) {
             background-color: #ecf0f1;
         }
-        .option-button.selected {
-            background-color: #dbeafe;
-            border-color: #3b82f6;
-            color: #3b82f6;
+        /* --- ADDED/MODIFIED STYLES FOR INSTANT FEEDBACK --- */
+        .option-button.correct {
+            background-color: #dcfce7; /* green-100 */
+            border-color: #22c55e; /* green-500 */
+            color: #166534; /* green-800 */
             font-weight: 600;
+        }
+        .option-button.wrong {
+            background-color: #fee2e2; /* red-100 */
+            border-color: #ef4444; /* red-500 */
+            color: #991b1b; /* red-800 */
+            font-weight: 600;
+        }
+        .option-button:disabled {
+            cursor: not-allowed;
         }
         /* Custom scrollbar */
         #question-palette::-webkit-scrollbar { width: 5px; }
@@ -65,7 +75,6 @@
 <body class="text-gray-900">
     <div id="app" class="hidden">
         
-        <!-- NTA Style Header -->
         <header class="bg-white shadow-sm sticky top-0 z-40 border-b">
             <div class="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
                 <div class="flex justify-between items-center">
@@ -92,12 +101,11 @@
 
                 <section id="test-view" class="hidden">
                     <div class="lg:flex lg:gap-6">
-                        <!-- Left Column: Question Panel -->
                         <div class="flex-grow bg-white p-4 md:p-6 rounded-md shadow-sm border">
                             <div class="flex justify-between items-center mb-4 border-b border-gray-200 pb-3">
                                 <h2 id="question-title" class="text-lg font-bold text-gray-700">Question <span id="current-q-number">1</span></h2>
                             </div>
-                            <div id="question-content" class="text-lg mb-3 leading-relaxed min-h-[80px]">
+                            <div id="question-content" class="text-lg mb-2 leading-relaxed min-h-[80px]">
                                 <p id="question-text"></p>
                             </div>
                             
@@ -114,8 +122,6 @@
                                 <div class="flex flex-wrap gap-3">
                                     <button id="save-next-btn" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 text-sm font-medium shadow-sm">SAVE & NEXT</button>
                                     <button id="save-mark-btn" class="px-4 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 text-sm font-medium shadow-sm">SAVE & MARK FOR REVIEW</button>
-                                    <button id="mark-next-btn" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm font-medium shadow-sm">MARK FOR REVIEW & NEXT</button>
-                                    <button id="clear-response-btn" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 text-sm font-medium shadow-sm">CLEAR RESPONSE</button>
                                 </div>
                                 <div class="flex items-center justify-between pt-2">
                                     <div class="flex items-center space-x-4">
@@ -127,7 +133,6 @@
                             </div>
                         </div>
 
-                        <!-- Right Column: Palette and Info -->
                         <div class="bg-white p-4 rounded-md shadow-sm border lg:w-80 lg:flex-shrink-0 mt-6 lg:mt-0">
                              <div id="palette-legend" class="grid grid-cols-2 gap-x-4 gap-y-3 mb-4 p-3 border border-dashed rounded-md text-xs">
                                 <div class="flex items-center space-x-2"><span id="answered-count" class="w-6 h-6 flex items-center justify-center font-bold answered">0</span><p>Answered</p></div>
@@ -175,8 +180,6 @@
         // Buttons
         const saveNextBtn = document.getElementById('save-next-btn');
         const saveMarkBtn = document.getElementById('save-mark-btn');
-        const markNextBtn = document.getElementById('mark-next-btn');
-        const clearResponseBtn = document.getElementById('clear-response-btn');
         const prevBtn = document.getElementById('prev-btn');
         const nextBtn = document.getElementById('next-btn');
         const submitTestBtn = document.getElementById('submit-test-btn');
@@ -201,7 +204,7 @@
 
         async function saveResultsToSupabase() {
             const recordsToUpsert = testState.map((state, index) => {
-                if (state.status === 'not-visited') return null;
+                if (state.status === 'not-visited' && state.selectedOption === null) return null;
                 
                 const question = currentQuestions[index];
                 const isCorrect = state.selectedOption === question.answer;
@@ -261,35 +264,49 @@
             renderQuestion();
         }
 
+        // --- MODIFIED FUNCTION ---
         function renderQuestion() {
             const question = currentQuestions[currentQuestionIndex];
             const state = testState[currentQuestionIndex];
             questionText.textContent = question.question;
 
             optionsContainer.innerHTML = question.options.map((option, index) => {
-                let classes = 'option-button w-full text-left p-3 border rounded-md transition-all';
-                if (state.selectedOption === index) {
-                    classes += ' selected';
-                }
-                return `<button class="${classes}" data-option-index="${index}"><span>${String.fromCharCode(65 + index)}. ${option}</span></button>`;
+                return `<button class="option-button w-full text-left p-3 border rounded-md transition-all" data-option-index="${index}"><span>${String.fromCharCode(65 + index)}. ${option}</span></button>`;
             }).join('');
-            
-            // Inside the renderQuestion() function in ntacopy.html
 
-            // Show explanation
             const explanationContainer = document.getElementById('explanation-container');
             const explanationText = document.getElementById('explanation-text');
+
             if (question.explanation) {
                 explanationText.textContent = question.explanation;
-                // By removing the line below, the explanation remains hidden by default.
-                // explanationContainer.classList.remove('hidden'); 
+                explanationContainer.classList.add('hidden');
             } else {
                 explanationContainer.classList.add('hidden');
+            }
+
+            if (state.selectedOption !== null) {
+                const allOptionButtons = optionsContainer.querySelectorAll('.option-button');
+                const selectedIndex = state.selectedOption;
+                const correctAnswerIndex = question.answer;
+
+                allOptionButtons.forEach((btn, index) => {
+                    btn.disabled = true;
+                    if (index === correctAnswerIndex) {
+                        btn.classList.add('correct');
+                    } else if (index === selectedIndex) {
+                        btn.classList.add('wrong');
+                    }
+                });
+
+                if (question.explanation) {
+                    explanationContainer.classList.remove('hidden');
+                }
             }
 
             currentQNumber.textContent = currentQuestionIndex + 1;
             updatePalette();
         }
+
 
         function updatePalette() {
             let answered = 0, notAnswered = 0, notVisited = 0, marked = 0, answeredMarked = 0;
@@ -360,16 +377,35 @@
             }
         }
         
-        // Event Listeners
+        // --- MODIFIED EVENT LISTENER ---
         optionsContainer.addEventListener('click', (e) => {
-            const button = e.target.closest('button[data-option-index]');
-            if (button) {
-                const index = parseInt(button.dataset.optionIndex);
-                const state = testState[currentQuestionIndex];
-                state.selectedOption = (state.selectedOption === index) ? null : index;
-                renderQuestion();
+            const clickedButton = e.target.closest('button[data-option-index]');
+            if (!clickedButton || clickedButton.disabled) return;
+
+            const selectedIndex = parseInt(clickedButton.dataset.optionIndex);
+            const question = currentQuestions[currentQuestionIndex];
+            const state = testState[currentQuestionIndex];
+            const correctAnswerIndex = question.answer;
+
+            state.selectedOption = selectedIndex;
+
+            const allOptionButtons = optionsContainer.querySelectorAll('.option-button');
+
+            allOptionButtons.forEach((btn, index) => {
+                btn.disabled = true;
+                if (index === correctAnswerIndex) {
+                    btn.classList.add('correct');
+                } else if (index === selectedIndex) {
+                    btn.classList.add('wrong');
+                }
+            });
+            
+            const explanationContainer = document.getElementById('explanation-container');
+            if (question.explanation) {
+                explanationContainer.classList.remove('hidden');
             }
         });
+
         
         questionPalette.addEventListener('click', (e) => {
             const button = e.target.closest('button[data-q-index]');
@@ -406,19 +442,6 @@
                 state.status = 'marked';
             }
             handleNavigation(true);
-        });
-
-        markNextBtn.addEventListener('click', () => {
-            const state = testState[currentQuestionIndex];
-            if (state.status !== 'answered' && state.status !== 'answered-marked') {
-               state.status = 'marked';
-            }
-            handleNavigation(true);
-        });
-
-        clearResponseBtn.addEventListener('click', () => {
-            testState[currentQuestionIndex].selectedOption = null;
-            renderQuestion();
         });
 
         prevBtn.addEventListener('click', () => handleNavigation(false));
