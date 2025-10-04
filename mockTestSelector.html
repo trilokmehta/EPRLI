@@ -72,13 +72,13 @@
                             <label for="question-count" class="block text-sm font-medium text-gray-700 mb-1.5">Number of Questions</label>
                             <select id="question-count" class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                                 <option value="30">30</option>
-                                <option value="50">50</option>
-                                <option value="100" selected>100</option>
+                                <option value="50" selected>50</option>
+                                <option value="100">100</option>
                                 <option value="150">150</option>
                             </select>
                          </div>
                          <div class="mt-2 md:mt-7 p-3 text-center bg-blue-50 border-l-4 border-blue-400 rounded">
-                             <p class="text-sm text-blue-800">Estimated Time: <span id="estimated-time" class="font-bold">150 Minutes</span></p>
+                             <p class="text-sm text-blue-800">Estimated Time: <span id="estimated-time" class="font-bold">160 Minutes</span></p>
                          </div>
                      </div>
                 </div>
@@ -146,7 +146,7 @@
             
             function updateEstimatedTime() {
                 const count = parseInt(questionCountSelect.value);
-                const minutes = Math.ceil(count * 1.5);
+                const minutes = Math.ceil(count * 1.6); // Changed from 1.5 to 1.6
                 estimatedTimeSpan.textContent = `${minutes} Minutes`;
             }
 
@@ -172,8 +172,6 @@
                 const subjectNames = Array.from(selectedCheckboxes).map(cb => cb.dataset.name).join(', ');
                 const count = questionCountSelect.value;
                 
-                // Note: The 'ntacopy.html' page will need to be updated to handle a comma-separated list of 'subject_ids'
-                // This will allow it to fetch questions from multiple subjects for the mock test.
                 const url = `ntacopy.html?subject_ids=${subjectIds}&subject_name=${encodeURIComponent('Mock Test: ' + subjectNames)}&count=${count}`;
                 window.location.href = url;
             });
