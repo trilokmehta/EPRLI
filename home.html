@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CUET Pro - Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --color-primary: #007AFF; --color-light-bg: #F0F4F7; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--color-light-bg); }
+        .fade-in { animation: fadeIn 1s ease-in-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="text-gray-900">
+
+    <div id="app" class="hidden"> <!-- Hide app until auth check is complete -->
+        <header class="bg-white shadow-md sticky top-0 z-40">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-16">
+                    <div class="flex items-center">
+                        <span class="font-extrabold text-2xl" style="color: var(--color-primary);">CUET Pro</span>
+                    </div>
+                    <div class="flex items-center">
+                        <div id="user-email" class="text-sm text-gray-600 mr-4"></div>
+                        <button id="logout-btn" class="px-4 py-2 text-sm font-medium text-white rounded-lg hover:opacity-90 transition-colors" style="background-color: #EF4444;">
+                            Logout
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="max-w-7xl mx-auto p-4 md:p-6 lg:p-8">
+            <div id="view-container">
+                <main id="subjects-view" class="fade-in">
+                    <h1 class="text-xl md:text-3xl font-bold mb-2 text-gray-800">Dashboard</h1>
+                    <p class="text-gray-500 mb-8">Time to focus. Pick a subject and get to work.</p>
+                    <div id="subjects-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6"></div>
+                    <div id="loading-spinner" class="text-center p-10">
+                        <svg class="animate-spin h-10 w-8 text-gray-500 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    </div>
+                </main>
+
+                <section id="subject-detail-view" class="hidden fade-in">
+                    <button id="back-to-dashboard" class="mb-6 inline-flex items-center text-sm font-medium text-gray-600 hover:text-blue-500 transition-colors">
+                        <!-- **ARROW FIXED HERE** -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><path d="m15 18-6-6 6-6"/></svg>
+                        Back to Dashboard
+                    </button>
+                    <div class="bg-white p-4 md:p-6 rounded-xl shadow-lg">
+                        <h2 id="subject-title" class="text-xl md:text-3xl font-bold mb-1 text-gray-800"></h2>
+                        <p class="text-gray-500 mb-8">Configure your practice session below.</p>
+                        <div class="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                                <div>
+                                    <label for="practice-category" class="block text-sm font-medium text-gray-700 mb-1.5">Category</label>
+                                    <select id="practice-category" class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"><option value="all" selected>All Questions</option><option value="unattempted">Unattempted</option><option value="incorrect">Incorrect Answers</option></select>
+                                </div>
+                                <div>
+                                    <label for="practice-count" class="block text-sm font-medium text-gray-700 mb-1.5">No. of Questions</label>
+                                    <select id="practice-count" class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"><option>10</option><option>20</option><option selected>30</option><option value="all">All</option></select>
+                                </div>
+                                <div><button id="start-practice-btn" class="w-full py-2.5 px-5 text-white rounded-lg hover:opacity-90 transition-colors font-medium" style="background-color: var(--color-primary);">Start Practice</button></div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://laredtouarpjxmzwvcco.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxhcmVkdG91YXJwanhtend2Y2NvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkzNzkxMjMsImV4cCI6MjA3NDk1NTEyM30.pJR9Nky9eECeyMmNU1tux3VuywX7Cl_zmP7eCf7iZ3I';
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // --- Authentication Guard ---
+        let currentUser = null;
+        supabaseClient.auth.getSession().then(({ data: { session } }) => {
+            if (!session) {
+                window.location.href = 'login.html';
+            } else {
+                currentUser = session.user;
+                document.getElementById('user-email').textContent = currentUser.email;
+                document.getElementById('app').classList.remove('hidden');
+                initializeApp();
+            }
+        });
+
+        function initializeApp() {
+            const views = { dashboard: document.getElementById('subjects-view'), subjectDetail: document.getElementById('subject-detail-view') };
+            const subjectsGrid = document.getElementById('subjects-grid');
+            const loadingSpinner = document.getElementById('loading-spinner');
+            const subjectTitle = document.getElementById('subject-title');
+            const backToDashboardBtn = document.getElementById('back-to-dashboard');
+            const startPracticeBtn = document.getElementById('start-practice-btn');
+            const logoutBtn = document.getElementById('logout-btn');
+            let allSubjects = [], currentSubject = null;
+
+            function switchView(viewName) {
+                Object.values(views).forEach(v => v.classList.add('hidden'));
+                if (views[viewName]) views[viewName].classList.remove('hidden');
+                
+            }
+
+            async function selectSubject(subjectId) {
+    currentSubject = allSubjects.find(s => s.id === subjectId);
+    if (currentSubject) {
+        subjectTitle.textContent = currentSubject.name;
+
+        // 👇 define tableName properly
+        const tableName = `questions_${currentSubject.name.toLowerCase().replace(/ /g, '_')}`;
+
+        console.log(`Fetching from table: ${tableName}`);
+
+        const { data, error } = await supabaseClient
+            .from(tableName)
+            .select('*');
+
+        if (error) {
+            console.error("Error fetching questions:", error);
+            return;
+        }
+
+        if (data && data.length > 0) {
+            currentQuestions = data.map(q => ({
+                id: q.id,
+                question: q.question_text,
+                options: [q.option_a, q.option_b, q.option_c, q.option_d],
+                answer: q.correct_answer,
+                topic: q.topic || "General"
+            }));
+
+            testState = currentQuestions.map(() => ({
+                selectedOption: null,
+                status: 'not-visited'
+            }));
+
+            switchView('subjectDetail');
+        } else {
+            console.warn(`No questions found in ${tableName}`);
+        }
+    }
+}
+
+            async function updateQuestionCounts() {
+                const { data, error } = await supabaseClient.rpc('get_all_subject_question_counts');
+                if (error) {
+                    console.error("Error fetching question counts:", error);
+                    return;
+                }
+                data.forEach(item => {
+                    const countElement = document.getElementById(`count-${item.subject_id}`);
+                    if (countElement) {
+                        countElement.textContent = item.question_count;
+                    }
+                });
+            }
+            
+
+            
+            logoutBtn.addEventListener('click', async () => {
+                await supabaseClient.auth.signOut();
+                window.location.href = 'login.html';
+            });
+            
+            backToDashboardBtn.addEventListener('click', () => switchView('dashboard'));
+
+            startPracticeBtn.addEventListener('click', () => {
+                if (!currentSubject) return;
+                const filterCategory = document.getElementById('practice-category').value;
+                const count = document.getElementById('practice-count').value;
+                window.location.href = `questions/index.html?subject_id=${currentSubject.id}&subject_name=${encodeURIComponent(currentSubject.name)}&mode=practice&filter=${filterCategory}&count=${count}`;
+            });
+
+            async function fetchData() {
+                try {
+                    const { data, error } = await supabaseClient.from('subjects').select('*');
+                    if (error) throw error;
+                    allSubjects = data;
+                    subjectsGrid.innerHTML = allSubjects.map(subject => `
+                        <div class="subject-card p-5 rounded-xl bg-white border border-gray-200 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer flex flex-col" data-subject-id="${subject.id}">
+                            <div class="flex-grow">
+                                <h3 class="text-xl font-bold text-gray-800">${subject.name}</h3>
+                                <p class="text-sm text-gray-500 mt-1">${subject.tagline}</p>
+                            </div>
+                            <p class="text-sm text-gray-500 mt-4 pt-2 border-t border-gray-100">
+                                Questions: <span id="count-${subject.id}" class="font-bold text-gray-700">...</span>
+                            </p>
+                        </div>
+                    `).join('');
+                    await updateQuestionCounts();
+
+                    document.querySelectorAll('.subject-card').forEach(card => {
+                        card.addEventListener('click', () => selectSubject(parseInt(card.dataset.subjectId)));
+                    });
+                } catch (error) {
+                    console.error("Error fetching subjects:", error);
+                    subjectsGrid.innerHTML = `<p class="col-span-full text-center text-red-500">Could not load subjects. Please check if the 'subjects' table exists and has RLS enabled.</p>`;
+                } finally {
+                    loadingSpinner.classList.add('hidden');
+                }
+            }
+            
+            fetchData();
+            switchView('dashboard');
+        }
+    </script>
+</body>
+</html>
+
