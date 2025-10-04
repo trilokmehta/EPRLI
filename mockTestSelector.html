@@ -210,7 +210,7 @@
                 const subjectNames = allSelections.map(el => el.dataset.name).join(', ');
                 const count = questionCountSelect.value;
                 
-                const url = `ntacopy.html?subject_ids=${subjectIds}&subject_name=${encodeURIComponent('Mock Test: ' + subjectNames)}&count=${count}`;
+                const url = `mock_test.html?subject_ids=${subjectIds}&subject_name=${encodeURIComponent('Mock Test: ' + subjectNames)}&count=${count}`;
                 window.location.href = url;
             });
 
