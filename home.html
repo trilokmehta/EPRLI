@@ -83,7 +83,7 @@
         let currentUser = null;
         supabaseClient.auth.getSession().then(({ data: { session } }) => {
             if (!session) {
-                window.location.href = 'login.html';
+                window.location.href = 'index.html';
             } else {
                 currentUser = session.user;
                 document.getElementById('user-email').textContent = currentUser.email;
@@ -166,7 +166,7 @@
             
             logoutBtn.addEventListener('click', async () => {
                 await supabaseClient.auth.signOut();
-                window.location.href = 'login.html';
+                window.location.href = 'index.html';
             });
             
             backToDashboardBtn.addEventListener('click', () => switchView('dashboard'));
@@ -213,5 +213,4 @@
     </script>
 </body>
 </html>
-
 
