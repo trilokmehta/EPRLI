@@ -202,37 +202,40 @@
             }
         });
 
-        async function saveResultsToSupabase() {
-            const recordsToUpsert = testState.map((state, index) => {
-                if (state.status === 'not-visited' && state.selectedOption === null) return null;
-                
-                const question = currentQuestions[index];
-                const isCorrect = state.selectedOption === question.answer;
-                
-                let finalStatus = 'incorrect';
-                if (state.selectedOption === null) {
-                    finalStatus = 'unattempted';
-                } else if (isCorrect) {
-                    finalStatus = 'correct';
-                }
-
-                return {
-                    user_id: currentUser.id,
-                    question_id: question.id,
-                    subject_id: currentSubjectId,
-                    status: finalStatus,
-                    topic: question.topic,
-                    difficulty: question.difficulty
-                };
-            }).filter(Boolean);
-
-            if (recordsToUpsert.length > 0) {
-                const { error } = await supabaseClient
-                    .from('user_question_status')
-                    .upsert(recordsToUpsert, { onConflict: 'user_id, question_id' });
-                if (error) console.error("Error saving results:", error);
-            }
+        
+async function saveResultsToSupabase() {
+    // This function will now only create records for questions that were actually answered.
+    const recordsToUpsert = testState.map((state, index) => {
+        // If the question was skipped (no option selected), return null and ignore it.
+        if (state.selectedOption === null) {
+            return null;
         }
+        
+        const question = currentQuestions[index];
+        const newStatus = state.selectedOption === question.answer ? 'correct' : 'incorrect';
+
+        return {
+            user_id: currentUser.id,
+            question_id: question.id,
+            subject_id: currentSubjectId,
+            status: newStatus,
+            topic: question.topic,
+            difficulty: question.difficulty
+        };
+    }).filter(Boolean); // This line removes all the null (skipped) questions.
+
+    // If there are any answered questions, save them to Supabase.
+    if (recordsToUpsert.length > 0) {
+        const { error } = await supabaseClient
+            .from('user_question_status')
+            .upsert(recordsToUpsert, { onConflict: 'user_id, question_id, subject_id' });
+        
+        if (error) {
+            console.error("CRITICAL ERROR saving results:", error);
+            alert("There was an error saving your progress. Please check the console.");
+        }
+    }
+}
 
         async function submitTest() {
             clearInterval(timerInterval);
@@ -454,3 +457,4 @@
     </script>
 </body>
 </html>
+
