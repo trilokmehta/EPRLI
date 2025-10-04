@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CUET Pro - Mock Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --color-primary: #007AFF; --color-light-bg: #F0F4F7; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--color-light-bg); }
+        .question-palette-item { transition: all 0.2s ease-in-out; }
+        .not-answered { background-color: #e0e0e0; color: #333; }
+        .answered { background-color: #4CAF50; color: white; }
+        .marked { background-color: #9C27B0; color: white; }
+        .not-visited { background-color: #f1f1f1; color: #555; border: 1px solid #ddd; }
+        .current { border: 2px solid var(--color-primary); }
+    </style>
+</head>
+<body class="text-gray-900">
+
+    <div id="loader" class="flex items-center justify-center h-screen">
+        <div class="text-center">
+            <h2 class="text-2xl font-semibold mb-2">Preparing your test...</h2>
+            <p class="text-gray-600">Please wait while we load the questions.</p>
+        </div>
+    </div>
+
+    <div id="test-container" class="hidden">
+        <header class="bg-white shadow-md sticky top-0 z-40">
+            <div class="max-w-7xl mx-auto px-4 sm-px-6 lg-px-8">
+                <div class="flex items-center justify-between h-16">
+                    <h1 id="test-name" class="font-bold text-xl text-gray-800">Mock Test</h1>
+                    <div class="flex items-center space-x-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span class="font-semibold text-lg text-red-600" id="timer">00:00:00</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="max-w-7xl mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="lg:col-span-2 bg-white p-6 rounded-lg shadow-lg">
+                <h2 class="text-lg font-bold mb-4">Question <span id="question-number">1</span></h2>
+                <div id="question-text" class="text-gray-800 mb-6 prose">
+                    Loading question...
+                </div>
+                <div id="options-container" class="space-y-4">
+                    </div>
+                
+                <div class="mt-8 pt-6 border-t flex flex-wrap gap-4 items-center justify-between">
+                    <div>
+                        <button id="mark-review-btn" class="px-5 py-2.5 text-sm font-medium text-white bg-purple-600 rounded-lg hover:bg-purple-700">Mark for Review & Next</button>
+                        <button id="clear-response-btn" class="px-5 py-2.5 text-sm font-medium text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300">Clear Response</button>
+                    </div>
+                    <div>
+                        <button id="prev-btn" class="px-5 py-2.5 text-sm font-medium text-white bg-gray-500 rounded-lg hover:bg-gray-600 disabled:opacity-50" disabled>Previous</button>
+                        <button id="next-btn" class="px-5 py-2.5 text-sm font-medium text-white rounded-lg hover:opacity-90" style="background-color: var(--color-primary);">Save & Next</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lg:col-span-1">
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <h3 class="font-bold text-lg mb-4 border-b pb-2">Question Palette</h3>
+                    <div id="question-palette" class="grid grid-cols-5 md:grid-cols-6 lg:grid-cols-5 gap-2">
+                        </div>
+                    <div class="mt-6 pt-4 border-t">
+                        <button id="submit-btn" class="w-full py-3 text-white font-semibold bg-green-600 rounded-lg hover:bg-green-700">Submit Test</button>
+                    </div>
+                </div>
+                 <div class="bg-white p-4 rounded-lg shadow-lg mt-6">
+                     <h3 class="font-bold text-lg mb-3">Legend</h3>
+                     <div class="grid grid-cols-2 gap-2 text-sm">
+                         <div class="flex items-center gap-2"><span class="w-5 h-5 rounded-full answered"></span> Answered</div>
+                         <div class="flex items-center gap-2"><span class="w-5 h-5 rounded-full not-answered"></span> Not Answered</div>
+                         <div class="flex items-center gap-2"><span class="w-5 h-5 rounded-full not-visited"></span> Not Visited</div>
+                         <div class="flex items-center gap-2"><span class="w-5 h-5 rounded-full marked"></span> Marked</div>
+                     </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+<script>
+    // Use the same Supabase credentials from your setup page
+    const SUPABASE_URL = 'https://laredtouarpjxmzwvcco.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxhcmVkdG91YXJwanhtend2Y2NvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkzNzkxMjMsImV4cCI6MjA3NDk1NTEyM30.pJR9Nky9eECeyMmNU1tux3VuywX7Cl_zmP7eCf7iZ3I';
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // --- DOM Elements ---
+    const loader = document.getElementById('loader');
+    const testContainer = document.getElementById('test-container');
+    const testNameEl = document.getElementById('test-name');
+    const timerEl = document.getElementById('timer');
+    const questionNumberEl = document.getElementById('question-number');
+    const questionTextEl = document.getElementById('question-text');
+    const optionsContainer = document.getElementById('options-container');
+    const questionPalette = document.getElementById('question-palette');
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const markReviewBtn = document.getElementById('mark-review-btn');
+    const clearResponseBtn = document.getElementById('clear-response-btn');
+    const submitBtn = document.getElementById('submit-btn');
+
+    // --- Test State ---
+    let questions = [];
+    let userAnswers = []; // Stores { answer: 'option_b', status: 'answered' }
+    let currentQuestionIndex = 0;
+    let timerInterval;
+
+    // --- Initialization ---
+    document.addEventListener('DOMContentLoaded', () => {
+        const params = new URLSearchParams(window.location.search);
+        const subjectIds = params.get('subject_ids')?.split(',').map(Number); // Ensure IDs are numbers
+        const testName = params.get('subject_name');
+        const questionCount = parseInt(params.get('count')) || 50;
+
+        if (!subjectIds || subjectIds.length === 0) {
+            handleError("No subjects selected. Please go back and select subjects.");
+            return;
+        }
+
+        testNameEl.textContent = decodeURIComponent(testName || 'Mock Test');
+        
+        loadTest(subjectIds, questionCount);
+    });
+
+    // --- UPDATED FUNCTION ---
+    async function loadTest(subjectIds, count) {
+        try {
+            // 1. Get the names of the selected subjects from your 'subjects' table
+            const { data: subjectsData, error: subjectsError } = await supabaseClient
+                .from('subjects')
+                .select('name')
+                .in('id', subjectIds);
+
+            if (subjectsError) throw subjectsError;
+
+            // 2. Create the table names based on the subject names
+            //    (e.g., "Computer Science .IP" -> "questions_computer_science_ip")
+            const tableNames = subjectsData.map(subject => {
+                return `questions_${subject.name.toLowerCase().replace(/\s/g, '_').replace(/\./g, '')}`;
+            });
+
+            // 3. Create a list of promises to fetch questions from each table
+            const fetchPromises = tableNames.map(tableName => 
+                supabaseClient.from(tableName).select('*')
+            );
+
+            // 4. Run all fetch requests at the same time
+            const results = await Promise.all(fetchPromises);
+
+            // 5. Combine all questions from all tables into one big array
+            let allQuestions = [];
+            results.forEach(result => {
+                if (result.error) {
+                    // Log a warning but don't stop the test if one table fails to load
+                    console.warn(`Could not load questions from a table: ${result.error.message}`);
+                }
+                if (result.data) {
+                    allQuestions.push(...result.data);
+                }
+            });
+
+            if (allQuestions.length === 0) {
+                handleError("No questions found for the selected subjects. Please check if the table names are correct.");
+                return;
+            }
+
+            // 6. Shuffle the questions and pick the number the user wanted
+            const shuffledQuestions = allQuestions.sort(() => 0.5 - Math.random());
+            questions = shuffledQuestions.slice(0, count);
+            
+            if (questions.length === 0) {
+                handleError("Could not retrieve any questions after processing.");
+                return;
+            }
+
+            initializeAnswers();
+            renderTest();
+            startTimer(questions.length * 1.6); 
+
+        } catch (error) {
+            handleError(`Error loading test: ${error.message}`);
+        }
+    }
+
+    function handleError(message) {
+        loader.innerHTML = `<div class="text-center text-red-500">
+            <h2 class="text-2xl font-semibold mb-2">An Error Occurred</h2>
+            <p>${message}</p>
+            <a href="home.html" class="mt-4 inline-block px-4 py-2 text-white rounded" style="background-color: var(--color-primary);">Go to Dashboard</a>
+        </div>`;
+    }
+    
+    function initializeAnswers() {
+        userAnswers = questions.map(() => ({ answer: null, status: 'not-visited' }));
+    }
+
+    function renderTest() {
+        loader.classList.add('hidden');
+        testContainer.classList.remove('hidden');
+        renderQuestion(currentQuestionIndex);
+        renderPalette();
+    }
+
+    function renderQuestion(index) {
+        if (index < 0 || index >= questions.length) return;
+        
+        if (userAnswers[index].status === 'not-visited') {
+            userAnswers[index].status = 'not-answered';
+        }
+
+        const question = questions[index];
+        questionNumberEl.textContent = index + 1;
+        // The 'options' column seems to be a text array in your screenshot. 
+        // We'll adapt to that format. Let's assume the question text is in a 'question' column.
+        questionTextEl.innerHTML = question.question; 
+        
+        optionsContainer.innerHTML = '';
+        // Assuming 'options' is an array like: ["Option A", "Option B", "Option C", "Option D"]
+        question.options.forEach((optionText, i) => {
+            const optionValue = `option_${i}`; // e.g., option_0, option_1
+            const optionId = `q${index}_${optionValue}`;
+            const isChecked = userAnswers[index].answer === optionValue;
+            
+            const optionElement = document.createElement('label');
+            optionElement.htmlFor = optionId;
+            optionElement.className = 'flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-100';
+            
+            optionElement.innerHTML = `
+                <input type="radio" id="${optionId}" name="question${index}" value="${optionValue}" class="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500" ${isChecked ? 'checked' : ''}>
+                <span class="ml-3 text-gray-700">${optionText}</span>
+            `;
+            optionsContainer.appendChild(optionElement);
+        });
+
+        optionsContainer.querySelectorAll('input[type="radio"]').forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                userAnswers[index].answer = e.target.value;
+                if (userAnswers[index].status !== 'marked') {
+                   userAnswers[index].status = 'answered';
+                }
+            });
+        });
+        
+        updateNavigationButtons();
+        renderPalette();
+    }
+
+    function renderPalette() {
+        questionPalette.innerHTML = '';
+        questions.forEach((_, index) => {
+            const item = document.createElement('button');
+            item.textContent = index + 1;
+            item.className = `question-palette-item w-10 h-10 flex items-center justify-center rounded-md font-medium`;
+
+            const status = userAnswers[index].status;
+            if (status === 'answered') item.classList.add('answered');
+            else if (status === 'not-answered') item.classList.add('not-answered');
+            else if (status === 'marked') item.classList.add('marked');
+            else item.classList.add('not-visited');
+
+            if (index === currentQuestionIndex) {
+                item.classList.add('current');
+            }
+
+            item.addEventListener('click', () => {
+                currentQuestionIndex = index;
+                renderQuestion(currentQuestionIndex);
+            });
+            questionPalette.appendChild(item);
+        });
+    }
+
+    function updateNavigationButtons() {
+        prevBtn.disabled = currentQuestionIndex === 0;
+        if (currentQuestionIndex === questions.length - 1) {
+            nextBtn.textContent = 'Save';
+        } else {
+            nextBtn.textContent = 'Save & Next';
+        }
+    }
+
+    function startTimer(totalMinutes) {
+        let totalSeconds = Math.floor(totalMinutes * 60);
+        timerInterval = setInterval(() => {
+            if (totalSeconds < 0) {
+                clearInterval(timerInterval);
+                alert("Time's up! The test will be submitted automatically.");
+                submitTest(true); // Auto-submit
+                return;
+            }
+            const hours = Math.floor(totalSeconds / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            const seconds = totalSeconds % 60;
+            timerEl.textContent = 
+                `${String(hours).padStart(2, '0')}:` +
+                `${String(minutes).padStart(2, '0')}:` +
+                `${String(seconds).padStart(2, '0')}`;
+            totalSeconds--;
+        }, 1000);
+    }
+    
+    function submitTest(isAutoSubmit = false) {
+        clearInterval(timerInterval);
+        const answeredCount = userAnswers.filter(a => a.status === 'answered' || (a.status === 'marked' && a.answer != null)).length;
+        const total = questions.length;
+        
+        let confirmed = isAutoSubmit ? true : confirm(`Are you sure you want to submit the test?\n\nYou have attempted ${answeredCount} out of ${total} questions.`);
+
+        if (confirmed) {
+            alert('Test submitted successfully!');
+            window.location.href = 'analysis.html'; 
+        }
+    }
+    
+    // --- Event Listeners ---
+    nextBtn.addEventListener('click', () => {
+        if (currentQuestionIndex < questions.length - 1) {
+            currentQuestionIndex++;
+            renderQuestion(currentQuestionIndex);
+        }
+    });
+
+    prevBtn.addEventListener('click', () => {
+        if (currentQuestionIndex > 0) {
+            currentQuestionIndex--;
+            renderQuestion(currentQuestionIndex);
+        }
+    });
+    
+    markReviewBtn.addEventListener('click', () => {
+        userAnswers[currentQuestionIndex].status = 'marked';
+        if (currentQuestionIndex < questions.length - 1) {
+            nextBtn.click();
+        }
+        renderPalette();
+    });
+    
+    clearResponseBtn.addEventListener('click', () => {
+        optionsContainer.querySelectorAll('input[type="radio"]').forEach(radio => radio.checked = false);
+        userAnswers[currentQuestionIndex].answer = null;
+        userAnswers[currentQuestionIndex].status = 'not-answered';
+        renderPalette();
+    });
+    
+    submitBtn.addEventListener('click', () => submitTest(false));
+
+</script>
+</body>
+</html>
