@@ -21,11 +21,13 @@
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex items-center justify-between h-16">
                     <div class="flex items-center">
-                        <span class="font-extrabold text-2xl" style="color: var(--color-primary);">CUET Pro</span>
+                        <a href="home.html" class="font-extrabold text-2xl" style="color: var(--color-primary);">CUET Pro</a>
                     </div>
-                    <div class="flex items-center">
-                        <div id="user-email" class="text-sm text-gray-600 mr-4"></div>
-                        <button id="logout-btn" class="px-4 py-2 text-sm font-medium text-white rounded-lg hover:opacity-90 transition-colors" style="background-color: #EF4444;">
+
+                    <div class="flex items-center space-x-4">
+                        <a href="analysis.html" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200">Analysis</a>
+                        <span id="user-email" class="text-sm text-gray-600"></span>
+                        <button id="logout-btn" class="px-4 py-2 text-sm font-medium text-white bg-red-500 rounded-lg hover:bg-red-600">
                             Logout
                         </button>
                     </div>
@@ -81,7 +83,7 @@
         let currentUser = null;
         supabaseClient.auth.getSession().then(({ data: { session } }) => {
             if (!session) {
-                window.location.href = 'login.html';
+                window.location.href = 'index.html';
             } else {
                 currentUser = session.user;
                 document.getElementById('user-email').textContent = currentUser.email;
@@ -164,7 +166,7 @@
             
             logoutBtn.addEventListener('click', async () => {
                 await supabaseClient.auth.signOut();
-                window.location.href = 'login.html';
+                window.location.href = 'index.html';
             });
             
             backToDashboardBtn.addEventListener('click', () => switchView('dashboard'));
@@ -173,7 +175,7 @@
                 if (!currentSubject) return;
                 const filterCategory = document.getElementById('practice-category').value;
                 const count = document.getElementById('practice-count').value;
-                window.location.href = `questions/index.html?subject_id=${currentSubject.id}&subject_name=${encodeURIComponent(currentSubject.name)}&mode=practice&filter=${filterCategory}&count=${count}`;
+                window.location.href = `ntacopy.html?subject_id=${currentSubject.id}&subject_name=${encodeURIComponent(currentSubject.name)}&filter=${filterCategory}&count=${count}`;
             });
 
             async function fetchData() {
