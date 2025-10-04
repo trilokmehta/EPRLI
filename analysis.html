@@ -23,10 +23,11 @@
         <header class="bg-white shadow-md sticky top-0 z-40">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex items-center justify-between h-16">
-                    <a href="/index.html" class="font-extrabold text-2xl" style="color: var(--color-primary);">CUET Pro</a>
+                    <a href="home.html" class="font-extrabold text-2xl" style="color: var(--color-primary);">CUET Pro</a>
                     <div class="flex items-center">
                         <div id="user-email" class="text-sm text-gray-600 mr-4"></div>
-                        <a href="/index.html" class="px-4 py-2 mr-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200">Dashboard</a>
+                        <a href="home.html" class="px-4 py-2 mr-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200">Dashboard</a>
+
                         <button id="logout-btn" class="px-4 py-2 text-sm font-medium text-white bg-red-500 rounded-lg hover:bg-red-600">Logout</button>
                     </div>
                 </div>
@@ -113,7 +114,10 @@
         const overallTab = document.getElementById('overall-tab-btn'), subjectsTab = document.getElementById('subjects-tab-btn'), overallView = document.getElementById('overall-view'), subjectSpecificView = document.getElementById('subject-specific-view');
         overallTab.addEventListener('click', () => { overallTab.classList.add('active'); subjectsTab.classList.remove('active'); overallView.classList.remove('hidden'); subjectSpecificView.classList.add('hidden'); });
         subjectsTab.addEventListener('click', () => { subjectsTab.classList.add('active'); overallTab.classList.remove('active'); subjectSpecificView.classList.remove('hidden'); overallView.classList.add('hidden'); });
-        document.getElementById('logout-btn').addEventListener('click', async () => { await supabaseClient.auth.signOut(); window.location.href = '/login.html'; });
+        document.getElementById('logout-btn').addEventListener('click', async () => { 
+        await supabaseClient.auth.signOut(); 
+        window.location.href = '/index.html'; // <- CORRECT
+    });
 
         async function loadInitialData() {
             try {
