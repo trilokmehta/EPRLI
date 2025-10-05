@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CUET Pro - Mock Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --color-primary: #007AFF; --color-light-bg: #F0F4F7; }
+        html, body, #app, #view-container { height: 100%; margin: 0; padding: 0; }
+        body { font-family: 'Inter', sans-serif; background-color: #fff; }
+
+        .not-visited { background-color: #f0f0f0; color: #333; border: 1px solid #ccc; }
+        .not-answered { background-color: #e74c3c; color: white; }
+        .answered { background-color: #2ecc71; color: white; }
+        .marked { background-color: #9b59b6; color: white; }
+        .answered-marked { background-color: #9b59b6; color: white; position: relative; }
+        .answered-marked::after {
+            content: ''; position: absolute; bottom: 3px; right: 3px;
+            width: 8px; height: 8px; background-color: #2ecc71; border-radius: 50%;
+        }
+        .question-palette-btn {
+            width: 40px; height: 30px; border-radius: 4px; font-weight: bold;
+            display: flex; align-items: center; justify-content: center; transition: transform 0.1s ease;
+        }
+        .current-q { border: 2px solid #3498db; transform: scale(1.1); }
+        
+        .option-radio-label {
+            display: inline-flex; align-items: center; cursor: pointer;
+            padding: 5px; border-radius: 50%; transition: background-color 0.2s ease;
+        }
+        .option-radio-input { display: none; }
+        .option-radio-label::before {
+            content: ''; width: 20px; height: 20px; border-radius: 50%;
+            border: 2px solid #555; display: inline-block; margin-right: 8px; background-color: #fff;
+        }
+        .option-radio-input:checked + .option-radio-label::before { background-color: #3498db; border-color: #2980b9; }
+
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #a8a8a8; border-radius: 3px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #888; }
+    </style>
+</head>
+<body class="text-gray-900">
+
+    <div id="app" class="h-full">
+        <div id="view-container" class="h-full">
+            <div id="loader" class="text-center p-10 flex items-center justify-center h-full"><p class="text-gray-600 font-medium text-lg">Preparing your test...</p></div>
+
+            <section id="test-container" class="hidden h-full flex flex-col">
+                <header class="flex flex-col md:flex-row items-center p-3 border-b border-gray-300 bg-gray-100 flex-shrink-0">
+                    <div class="flex items-center w-full md:w-auto">
+                        <div class="p-1 border-2 border-gray-300 rounded-md mr-4 flex-shrink-0">
+                            <svg class="w-12 h-12 text-gray-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>
+                        </div>
+                        <div class="grid grid-cols-[auto,1fr] gap-x-3 gap-y-1 text-sm w-full">
+                            <p class="font-medium text-gray-700 text-right">Candidate</p><p class="text-gray-700">: <span id="user-name" class="font-bold text-orange-500">[Your Name]</span></p>
+                            <p class="font-medium text-gray-700 text-right">Subject</p><p class="text-gray-700">: <span id="subject-name-header" class="font-bold text-orange-500"></span></p>
+                            <p class="font-medium text-gray-700 text-right">Time Left</p><p class="text-gray-700">: <span id="timer" class="font-bold text-white bg-sky-500 rounded-md px-2 py-0.5 text-base">00:00:00</span></p>
+                        </div>
+                    </div>
+                </header>
+
+                <main class="flex-1 flex flex-col lg:flex-row overflow-hidden">
+                    <div class="flex-1 flex flex-col p-4 md:p-6 custom-scrollbar overflow-y-auto">
+                        <div class="flex-grow">
+                            <div class="flex justify-between items-center mb-4 border-b border-gray-200 pb-3">
+                                <h2 class="text-lg font-bold text-gray-700">Question <span id="question-number">1</span></h2>
+                            </div>
+                            <div id="question-text" class="text-lg mb-2 leading-relaxed min-h-[80px]">Loading question...</div>
+                            <div id="options-container" class="space-y-3"></div>
+                        </div>
+                        
+                        <div class="border-t border-gray-200 mt-6 pt-4 space-y-4 flex-shrink-0">
+                             <div class="flex flex-wrap gap-3">
+                                <button id="save-next-btn" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 text-sm font-medium shadow-sm">SAVE & NEXT</button>
+                                <button id="save-mark-review-btn" class="px-4 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 text-sm font-medium shadow-sm">SAVE & MARK FOR REVIEW</button>
+                                <button id="mark-review-next-btn" class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 text-sm font-medium shadow-sm">MARK FOR REVIEW & NEXT</button>
+                                <button id="clear-response-btn" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 text-sm font-medium">CLEAR RESPONSE</button>
+                            </div>
+                            <div class="flex items-center justify-between pt-2">
+                                <div>
+                                    <button id="prev-btn" class="font-bold text-gray-600 hover:text-black disabled:opacity-50" disabled>&lt;&lt; BACK</button>
+                                    <button id="next-btn" class="font-bold text-gray-600 hover:text-black ml-4">NEXT &gt;&gt;</button>
+                                </div>
+                                <button id="submit-btn" class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-semibold shadow-sm">Submit Test</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="lg:w-80 lg:flex-shrink-0 p-4 border-t lg:border-t-0 lg:border-l border-gray-300 bg-gray-50 custom-scrollbar overflow-y-auto">
+                        <button id="toggle-palette-btn" class="w-full mb-4 p-2 bg-gray-200 text-gray-800 font-semibold rounded-md block lg:hidden">View Question Palette</button>
+                        <div id="palette-collapsible-content" class="hidden lg:block">
+                            <div id="palette-legend" class="grid grid-cols-2 gap-x-4 gap-y-3 mb-4 p-3 border border-dashed rounded-md text-xs bg-white">
+                                <div class="flex items-center space-x-2"><span id="answered-count" class="w-6 h-6 flex items-center justify-center font-bold answered">0</span><p>Answered</p></div>
+                                <div class="flex items-center space-x-2"><span id="not-answered-count" class="w-6 h-6 flex items-center justify-center font-bold not-answered">0</span><p>Not Answered</p></div>
+                                <div class="flex items-center space-x-2"><span id="not-visited-count" class="w-6 h-6 flex items-center justify-center font-bold not-visited">0</span><p>Not Visited</p></div>
+                                <div class="flex items-center space-x-2"><span id="marked-count" class="w-6 h-6 flex items-center justify-center font-bold marked rounded-full">0</span><p>Marked</p></div>
+                                <div class="col-span-2 flex items-center space-x-2"><span id="answered-marked-count" class="w-6 h-6 flex items-center justify-center font-bold answered-marked rounded-full">0</span><p>Answered & Marked</p></div>
+                            </div>
+                            <div id="question-palette" class="grid grid-cols-5 gap-2"></div>
+                        </div>
+                    </div>
+                </main>
+            </section>
+
+             <section id="results-view" class="hidden h-full flex flex-col items-center justify-center text-center p-8 bg-gray-50">
+                <div class="max-w-2xl mx-auto bg-white p-8 rounded-xl shadow-lg">
+                    <h2 class="text-3xl font-bold mb-2">Test Submitted!</h2>
+                    <p class="text-gray-600 mb-8">Your results have been saved.</p>
+                    <div class="mb-8">
+                        <span id="score-text" class="text-6xl font-extrabold text-indigo-600"></span>
+                        <p class="text-gray-500 font-medium mt-1">Final Score</p>
+                    </div>
+                    <div class="grid grid-cols-3 gap-4 text-center p-6 bg-gray-50 rounded-lg mb-8">
+                        <div><p id="results-correct" class="font-bold text-2xl text-green-600">0</p><p class="text-sm text-gray-500">Correct</p></div>
+                        <div><p id="results-incorrect" class="font-bold text-2xl text-red-600">0</p><p class="text-sm text-gray-500">Incorrect</p></div>
+                        <div><p id="results-unattempted" class="font-bold text-2xl text-gray-700">0</p><p class="text-sm text-gray-500">Unattempted</p></div>
+                    </div>
+                    <a href="analysis.html" id="analysis-link" class="w-full max-w-xs mx-auto inline-block px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-semibold">View Analysis</a>
+                </div>
+            </section>
+        </div>
+    </div>
+
+<script>
+    const SUPABASE_URL = 'https://laredtouarpjxmzwvcco.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxhcmVkdG91YXJwanhtend2Y2NvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkzNzkxMjMsImV4cCI6MjA3NDk1NTEyM30.pJR9Nky9eECeyMmNU1tux3VuywX7Cl_zmP7eCf7iZ3I';
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // --- DOM Elements ---
+    const app = document.getElementById('app');
+    const views = { loader: document.getElementById('loader'), test: document.getElementById('test-container'), results: document.getElementById('results-view') };
+    const subjectNameHeaderEl = document.getElementById('subject-name-header');
+    const timerEl = document.getElementById('timer');
+    const questionNumberEl = document.getElementById('question-number');
+    const questionTextEl = document.getElementById('question-text');
+    const optionsContainer = document.getElementById('options-container');
+    const questionPalette = document.getElementById('question-palette');
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const saveNextBtn = document.getElementById('save-next-btn');
+    const saveMarkReviewBtn = document.getElementById('save-mark-review-btn');
+    const markReviewNextBtn = document.getElementById('mark-review-next-btn');
+    const clearResponseBtn = document.getElementById('clear-response-btn');
+    const submitBtn = document.getElementById('submit-btn');
+    const userNameEl = document.getElementById('user-name');
+    const togglePaletteBtn = document.getElementById('toggle-palette-btn');
+
+    // Results View elements
+    const scoreText = document.getElementById('score-text');
+    const resultsCorrect = document.getElementById('results-correct');
+    const resultsIncorrect = document.getElementById('results-incorrect');
+    const resultsUnattempted = document.getElementById('results-unattempted');
+    const analysisLink = document.getElementById('analysis-link');
+
+    // --- Test State ---
+    let currentUser = null, questions = [], userAnswers = [], currentQuestionIndex = 0, currentSubjectId = null, currentSessionId = null, timerInterval, questionStartTime, totalTimeInSeconds;
+
+    function switchView(viewName) {
+        Object.values(views).forEach(v => v.classList.add('hidden'));
+        if(views[viewName]) views[viewName].classList.remove('hidden');
+    }
+
+    // --- Authentication and Initialization ---
+    supabaseClient.auth.getSession().then(({ data: { session } }) => {
+        if (!session) {
+            window.location.href = 'index.html';
+        } else {
+            currentUser = session.user;
+            app.classList.remove('hidden');
+            userNameEl.textContent = currentUser.email.split('@')[0];
+            initializeTest();
+        }
+    });
+
+    async function initializeTest() {
+        switchView('loader');
+        const params = new URLSearchParams(window.location.search);
+        currentSubjectId = parseInt(params.get('subject_ids'));
+        const subjectName = params.get('subject_name');
+        const questionCount = parseInt(params.get('count')) || 50;
+        const timeInMinutes = parseInt(params.get('time')) || 45;
+
+        if (!currentSubjectId || !currentUser) {
+            return handleError("Invalid test parameters or user not found.");
+        }
+        subjectNameHeaderEl.textContent = decodeURIComponent(subjectName || 'Mock Test');
+        
+        try {
+            currentSessionId = await createTestSession(questionCount);
+            if (!currentSessionId) throw new Error("Could not create a test session.");
+            await loadTest(subjectName, questionCount, timeInMinutes);
+            switchView('test');
+        } catch (error) {
+            handleError(error.message);
+        }
+    }
+
+    async function createTestSession(totalQuestions) {
+        const { data, error } = await supabaseClient.from('test_sessions').insert({ user_id: currentUser.id, subject_id: currentSubjectId, total_questions: totalQuestions }).select('id').single();
+        if (error) { console.error("Error creating test session:", error); return null; }
+        return data.id;
+    }
+
+    async function loadTest(subjectName, count, timeInMinutes) {
+        const cleanSubjectName = decodeURIComponent(subjectName).replace('Mock Test: ', '');
+        const tableName = `questions_${cleanSubjectName.toLowerCase().replace(/ /g, '_')}`;
+        
+        const { data, error } = await supabaseClient.from(tableName).select('*');
+        if (error) throw new Error(`Could not load questions. DB Error: ${error.message}`);
+        if (!data || data.length === 0) throw new Error(`No questions found for "${subjectName}". Is the table name '${tableName}' correct?`);
+
+        questions = data.sort(() => 0.5 - Math.random()).slice(0, count);
+        if (questions.length === 0) throw new Error("Could not retrieve any questions.");
+
+        initializeAnswers();
+        renderPalette();
+        navigateToQuestion(0);
+        startTimer(timeInMinutes);
+    }
+
+    function handleError(message) {
+        views.loader.innerHTML = `<div class="text-center text-red-500 p-4"><h2 class="text-2xl font-semibold mb-2">An Error Occurred</h2><p>${message}</p><a href="mockTestSelector.html" class="mt-6 inline-block px-5 py-2 text-white rounded-lg bg-blue-600">Go Back</a></div>`;
+        switchView('loader');
+    }
+    
+    function initializeAnswers() {
+        userAnswers = questions.map(() => ({ answer: null, status: 'not-visited', time_spent_seconds: 0 }));
+    }
+
+    function recordTimeSpent() {
+        if (questionStartTime) {
+            const timeSpent = Math.round((Date.now() - questionStartTime) / 1000);
+            userAnswers[currentQuestionIndex].time_spent_seconds += timeSpent;
+        }
+    }
+
+    function navigateToQuestion(index) {
+        recordTimeSpent();
+        currentQuestionIndex = index;
+        renderQuestion(index);
+        questionStartTime = Date.now();
+    }
+
+    function renderQuestion(index) {
+        const state = userAnswers[index];
+        if (state.status === 'not-visited') state.status = 'not-answered';
+        
+        const question = questions[index];
+        questionNumberEl.textContent = index + 1;
+        questionTextEl.innerHTML = question.question; 
+        
+        optionsContainer.innerHTML = `
+            <div class="mb-4 space-y-1">${question.options.map((option, i) => `<p class="text-gray-800 text-base leading-relaxed py-2">${i + 1}. ${option}</p>`).join('')}</div>
+            <div class="border-t pt-4 mt-4">
+                <div id="selector-radios" class="flex items-center space-x-3">${question.options.map((_, i) => {
+                    const isChecked = state.answer === i ? 'checked' : '';
+                    return `<div class="inline-block mr-4">
+                        <input type="radio" name="option" id="opt-${i}" value="${i}" class="option-radio-input" ${isChecked}>
+                        <label for="opt-${i}" class="option-radio-label text-gray-700"><span>(${i + 1})</span></label>
+                    </div>`;
+                }).join('')}</div>
+            </div>`;
+
+        updateNavigationButtons();
+        renderPalette();
+    }
+
+    function renderPalette() {
+        let counts = { answered: 0, 'not-answered': 0, 'not-visited': 0, marked: 0, 'answered-marked': 0 };
+        userAnswers.forEach(a => {
+            if (counts[a.status] !== undefined) counts[a.status]++;
+        });
+        document.getElementById('answered-count').textContent = counts.answered;
+        document.getElementById('not-answered-count').textContent = counts['not-answered'];
+        document.getElementById('not-visited-count').textContent = counts['not-visited'];
+        document.getElementById('marked-count').textContent = counts.marked;
+        document.getElementById('answered-marked-count').textContent = counts['answered-marked'];
+
+        questionPalette.innerHTML = userAnswers.map((state, index) => 
+            `<button class="question-palette-btn ${state.status} ${index === currentQuestionIndex ? 'current-q' : ''}" data-q-index="${index}">${index + 1}</button>`
+        ).join('');
+    }
+
+    function updateNavigationButtons() {
+        prevBtn.disabled = currentQuestionIndex === 0;
+        nextBtn.disabled = currentQuestionIndex === questions.length - 1;
+    }
+    
+    function startTimer(totalMinutes) {
+        totalTimeInSeconds = Math.floor(totalMinutes * 60);
+        let remainingSeconds = totalTimeInSeconds;
+        timerInterval = setInterval(() => {
+            if (remainingSeconds < 0) {
+                clearInterval(timerInterval);
+                submitTest(true);
+                return;
+            }
+            const hours = Math.floor(remainingSeconds / 3600);
+            const minutes = Math.floor((remainingSeconds % 3600) / 60);
+            const seconds = remainingSeconds % 60;
+            timerEl.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            remainingSeconds--;
+        }, 1000);
+    }
+
+    async function submitTest(isAutoSubmit = false) {
+        clearInterval(timerInterval);
+        recordTimeSpent();
+
+        const answeredCount = userAnswers.filter(a => a.answer !== null).length;
+        let confirmed = isAutoSubmit ? true : confirm(`Are you sure you want to submit the test?\nYou have attempted ${answeredCount} out of ${questions.length} questions.`);
+
+        if (confirmed) {
+            switchView('loader');
+            loader.innerHTML = `<h2 class="text-2xl font-semibold">Submitting results...</h2>`;
+
+            try {
+                let score = 0;
+                userAnswers.forEach((ans, i) => { if (ans.answer === questions[i].answer) score++; });
+                const timeTakenSeconds = totalTimeInSeconds - (parseInt(timerEl.textContent.split(':')[1]) * 60 + parseInt(timerEl.textContent.split(':')[2]));
+
+                await supabaseClient.from('test_sessions').update({ score: score, completed_at: new Date().toISOString(), time_taken_seconds: timeTakenSeconds }).eq('id', currentSessionId);
+
+                const answersToInsert = userAnswers.map((ans, i) => ({
+                    session_id: currentSessionId, user_id: currentUser.id, question_id: questions[i].id, subject_id: currentSubjectId,
+                    selected_option: ans.answer, status: ans.answer === null ? 'unattempted' : (ans.answer === questions[i].answer ? 'correct' : 'incorrect'),
+                    time_spent_seconds: ans.time_spent_seconds
+                }));
+                await supabaseClient.from('user_answers').insert(answersToInsert);
+
+                scoreText.textContent = `${score} / ${questions.length}`;
+                resultsCorrect.textContent = score;
+                resultsIncorrect.textContent = userAnswers.filter((a, i) => a.answer !== null && a.answer !== questions[i].answer).length;
+                resultsUnattempted.textContent = userAnswers.filter(a => a.answer === null).length;
+                analysisLink.href = `analysis.html?session_id=${currentSessionId}`;
+                switchView('results');
+
+            } catch (error) {
+                 handleError(`Could not save your results. Error: ${error.message}`);
+            }
+        }
+    }
+    
+    // --- Event Listeners ---
+    questionPalette.addEventListener('click', e => {
+        if (e.target.dataset.qIndex) navigateToQuestion(parseInt(e.target.dataset.qIndex));
+    });
+    
+    function move(isNext) {
+        const newIndex = isNext ? currentQuestionIndex + 1 : currentQuestionIndex - 1;
+        if (newIndex >= 0 && newIndex < questions.length) {
+            navigateToQuestion(newIndex);
+        } else if (isNext) {
+            // If on the last question and Save & Next is clicked, submit.
+            submitTest(false);
+        }
+    }
+
+    function updateAnswerAndStatus(action) {
+        const state = userAnswers[currentQuestionIndex];
+        const selectedRadio = document.querySelector('input[name="option"]:checked');
+        const answerValue = selectedRadio ? parseInt(selectedRadio.value) : null;
+
+        switch (action) {
+            case 'save':
+                state.answer = answerValue;
+                state.status = (answerValue !== null) ? 'answered' : 'not-answered';
+                break;
+            case 'save-mark':
+                state.answer = answerValue;
+                state.status = (answerValue !== null) ? 'answered-marked' : 'marked';
+                break;
+            case 'mark':
+                // Don't save the answer, just mark it
+                state.status = (state.status === 'answered') ? 'answered-marked' : 'marked';
+                break;
+        }
+    }
+
+    saveNextBtn.addEventListener('click', () => {
+        updateAnswerAndStatus('save');
+        move(true);
+    });
+
+    saveMarkReviewBtn.addEventListener('click', () => {
+        updateAnswerAndStatus('save-mark');
+        move(true);
+    });
+    
+    markReviewNextBtn.addEventListener('click', () => {
+        updateAnswerAndStatus('mark');
+        move(true);
+    });
+    
+    prevBtn.addEventListener('click', () => move(false));
+    nextBtn.addEventListener('click', () => move(true));
+
+    clearResponseBtn.addEventListener('click', () => {
+        userAnswers[currentQuestionIndex].answer = null;
+        userAnswers[currentQuestionIndex].status = 'not-answered';
+        renderQuestion(currentQuestionIndex); // Re-render to clear radio
+    });
+
+    submitBtn.addEventListener('click', () => submitTest(false));
+    
+    togglePaletteBtn.addEventListener('click', () => {
+        const paletteContent = document.getElementById('palette-collapsible-content');
+        paletteContent.classList.toggle('hidden');
+        togglePaletteBtn.textContent = paletteContent.classList.contains('hidden') ? 'View Question Palette' : 'Hide Question Palette';
+    });
+
+</script>
+
+</body>
+</html>
+

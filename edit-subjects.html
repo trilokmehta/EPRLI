@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CUET Pro - Customize Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --color-primary: #007AFF; --color-light-bg: #F0F4F7; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--color-light-bg); }
+        .fade-in { animation: fadeIn 0.5s ease-in-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .toast {
+            animation: slideInDown 0.5s, fadeOut 0.5s 2.5s;
+            transform: translateY(-100%);
+        }
+        @keyframes slideInDown { from { transform: translateY(-100%); } to { transform: translateY(0); } }
+        @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+    </style>
+</head>
+<body class="text-gray-900">
+
+    <!-- Toast Notification -->
+    <div id="toast-notification" class="fixed top-5 left-1/2 -translate-x-1/2 z-50 hidden">
+        <div class="bg-green-500 text-white font-semibold py-2 px-6 rounded-full shadow-lg">
+            <p>Changes saved successfully!</p>
+        </div>
+    </div>
+
+    <div id="app" class="hidden">
+        <header class="bg-white shadow-md sticky top-0 z-40">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-16">
+                    <a href="home.html" class="font-extrabold text-2xl" style="color: var(--color-primary);">CUET Pro</a>
+                    <a href="home.html" class="px-4 py-2 text-sm font-medium text-white rounded-lg hover:opacity-90 transition-colors" style="background-color: var(--color-primary);">Back to Dashboard</a>
+                </div>
+            </div>
+        </header>
+
+        <main class="max-w-7xl mx-auto p-4 md:p-6 lg:p-8">
+            <div class="text-center mb-8">
+                <h1 class="text-2xl md:text-4xl font-bold text-gray-800">Customize Your Dashboard</h1>
+                <p class="text-gray-500 mt-2 max-w-2xl mx-auto">Add or remove subjects to personalize your learning space. Changes are saved locally on your device.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
+                <!-- Your Subjects Section -->
+                <div class="bg-white p-4 md:p-6 rounded-xl shadow-lg fade-in">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                        <svg class="w-6 h-6 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        Your Subjects
+                    </h2>
+                    <div id="user-subjects-list" class="space-y-3 min-h-[100px]">
+                        <!-- Subjects will be dynamically inserted here -->
+                    </div>
+                </div>
+
+                <!-- Available Subjects Section -->
+                <div class="bg-white p-4 md:p-6 rounded-xl shadow-lg fade-in" style="animation-delay: 0.1s;">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                         <svg class="w-6 h-6 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+                        Available Subjects
+                    </h2>
+                    <div id="available-subjects-list" class="space-y-3 min-h-[100px]">
+                        <!-- Subjects will be dynamically inserted here -->
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <footer class="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-sm p-4 border-t border-gray-200">
+            <div class="max-w-7xl mx-auto">
+                 <button id="save-changes-btn" class="w-full py-3 px-5 text-white rounded-lg hover:opacity-90 transition-colors font-semibold text-lg" style="background-color: var(--color-primary);">Save Changes</button>
+            </div>
+        </footer>
+
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://laredtouarpjxmzwvcco.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxhcmVkdG91YXJwanhtend2Y2NvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkzNzkxMjMsImV4cCI6MjA3NDk1NTEyM30.pJR9Nky9eECeyMmNU1tux3VuywX7Cl_zmP7eCf7iZ3I';
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        let currentUser = null;
+
+        // --- Authentication Guard ---
+        supabaseClient.auth.getSession().then(({ data: { session } }) => {
+            if (!session) {
+                window.location.href = 'index.html';
+            } else {
+                currentUser = session.user;
+                document.getElementById('app').classList.remove('hidden');
+                initializeApp();
+            }
+        });
+
+        function initializeApp() {
+            // DOM Elements
+            const userSubjectsList = document.getElementById('user-subjects-list');
+            const availableSubjectsList = document.getElementById('available-subjects-list');
+            const saveChangesBtn = document.getElementById('save-changes-btn');
+            const toast = document.getElementById('toast-notification');
+
+            // State
+            let allSubjects = [];
+            let userSubjectIds = new Set();
+            const localStorageKey = `cuetProUserSubjects_${currentUser.id}`;
+
+            // --- Main Functions ---
+            
+            async function loadInitialData() {
+                try {
+                    // Fetch all subjects from Supabase
+                    const { data, error } = await supabaseClient.from('subjects').select('*');
+                    if (error) throw error;
+                    allSubjects = data;
+
+                    // Load user preferences from Local Storage
+                    const savedSubjectIds = localStorage.getItem(localStorageKey);
+                    if (savedSubjectIds) {
+                        JSON.parse(savedSubjectIds).forEach(id => userSubjectIds.add(id));
+                    } else {
+                        // If no preference is saved, add all subjects by default
+                        allSubjects.forEach(subject => userSubjectIds.add(subject.id));
+                    }
+                    
+                    renderLists();
+                } catch (error) {
+                    console.error("Error loading initial data:", error);
+                    userSubjectsList.innerHTML = `<p class="text-red-500">Could not load subjects.</p>`;
+                }
+            }
+
+            function renderLists() {
+                userSubjectsList.innerHTML = '';
+                availableSubjectsList.innerHTML = '';
+
+                if (allSubjects.length === 0) return;
+
+                const userSubjects = allSubjects.filter(s => userSubjectIds.has(s.id));
+                const availableSubjects = allSubjects.filter(s => !userSubjectIds.has(s.id));
+
+                if (userSubjects.length === 0) {
+                    userSubjectsList.innerHTML = `<p class="text-gray-400 text-center p-4">No subjects selected. Add some from the available list!</p>`;
+                } else {
+                    userSubjects.forEach(subject => {
+                        userSubjectsList.innerHTML += createSubjectCard(subject, 'remove');
+                    });
+                }
+
+                if (availableSubjects.length === 0) {
+                    availableSubjectsList.innerHTML = `<p class="text-gray-400 text-center p-4">You've selected all available subjects!</p>`;
+                } else {
+                    availableSubjects.forEach(subject => {
+                        availableSubjectsList.innerHTML += createSubjectCard(subject, 'add');
+                    });
+                }
+                
+                attachEventListeners();
+            }
+            
+            function createSubjectCard(subject, type) {
+                const isRemove = type === 'remove';
+                const buttonBg = isRemove ? 'bg-red-100 hover:bg-red-200' : 'bg-blue-100 hover:bg-blue-200';
+                const buttonText = isRemove ? 'text-red-600' : 'text-blue-600';
+                const icon = isRemove 
+                    ? `<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M20 12H4" /></svg>`
+                    : `<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" /></svg>`;
+
+                return `
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
+                        <div>
+                            <p class="font-bold text-gray-800">${subject.name}</p>
+                            <p class="text-sm text-gray-500">${subject.tagline}</p>
+                        </div>
+                        <button data-id="${subject.id}" data-action="${type}" class="subject-action-btn p-2 rounded-full ${buttonBg} ${buttonText} transition-colors">
+                           ${icon}
+                        </button>
+                    </div>
+                `;
+            }
+
+            function handleSubjectAction(e) {
+                const button = e.target.closest('.subject-action-btn');
+                if (!button) return;
+
+                const subjectId = parseInt(button.dataset.id);
+                const action = button.dataset.action;
+
+                if (action === 'add') {
+                    userSubjectIds.add(subjectId);
+                } else if (action === 'remove') {
+                    userSubjectIds.delete(subjectId);
+                }
+                
+                renderLists();
+            }
+
+            function attachEventListeners() {
+                document.querySelectorAll('.subject-action-btn').forEach(btn => {
+                    btn.addEventListener('click', handleSubjectAction);
+                });
+            }
+
+            function saveChanges() {
+                localStorage.setItem(localStorageKey, JSON.stringify(Array.from(userSubjectIds)));
+                toast.classList.remove('hidden');
+                toast.classList.add('toast');
+                setTimeout(() => {
+                    toast.classList.add('hidden');
+                    toast.classList.remove('toast');
+                }, 3000);
+            }
+            
+            // --- Event Listeners ---
+            saveChangesBtn.addEventListener('click', saveChanges);
+
+            // --- Initial Load ---
+            loadInitialData();
+        }
+    </script>
+</body>
+</html>
