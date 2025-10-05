@@ -97,11 +97,24 @@
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
                                 <div>
                                     <label for="practice-category" class="block text-sm font-medium text-gray-700 mb-1.5">Category</label>
-                                    <select id="practice-category" class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"><option value="all" selected>All Questions</option><option value="unattempted">Unattempted</option><option value="incorrect">Incorrect Answers</option></select>
-                                </div>
+                                    <select id="practice-category" class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                        <option value="all" selected>All Questions</option>
+                                        <option value="unattempted">Unattempted</option>
+                                        <option value="incorrect">Incorrect Answers</option>
+                                        <option value="correct">Correct Answers</option>
+                                    </select>
+                                                                    </div>
                                 <div>
                                     <label for="practice-count" class="block text-sm font-medium text-gray-700 mb-1.5">No. of Questions</label>
-                                    <select id="practice-count" class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"><option>10</option><option>20</option><option selected>30</option><option value="all">All</option></select>
+                                    <select id="practice-count" class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                        <option>10</option>
+                                        <option>25</option>
+                                        <option>50</option>
+                                        <option>100</option>
+                                        <option>200</option>
+                                        <option value="all">All</option>
+                                    </select>
+
                                 </div>
                                 <div><button id="start-practice-btn" class="w-full py-2.5 px-5 text-white rounded-lg hover:opacity-90 transition-colors font-medium" style="background-color: var(--color-primary);">Start Practice</button></div>
                             </div>
@@ -158,18 +171,31 @@
             }
 
             async function updateQuestionCounts() {
-                const { data, error } = await supabaseClient.rpc('get_all_subject_question_counts');
+            const countPromises = allSubjects.map(async (subject) => {
+                const tableName = `questions_${subject.name.toLowerCase()}`;
+                const { count, error } = await supabaseClient
+                .from(tableName)
+                .select('*', { count: 'exact', head: true });
+
                 if (error) {
-                    console.error("Error fetching question counts:", error);
-                    return;
+                console.warn(`Error fetching count for ${tableName}:`, error.message);
+                return { id: subject.id, count: 0 };
                 }
-                data.forEach(item => {
-                    const countElement = document.getElementById(`count-${item.subject_id}`);
-                    if (countElement) {
-                        countElement.textContent = item.question_count;
-                    }
-                });
+
+                return { id: subject.id, count };
+            });
+
+            // Run all fetches in parallel
+            const results = await Promise.all(countPromises);
+
+            // Update DOM only once
+            for (const r of results) {
+                const countElement = document.getElementById(`count-${r.id}`);
+                if (countElement) countElement.textContent = r.count ?? 0;
             }
+            }
+
+            
 
             userMenuButton.addEventListener('click', (event) => {
                 event.stopPropagation();
