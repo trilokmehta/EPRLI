@@ -19,6 +19,91 @@
             font-family: 'Inter', sans-serif;
             background-color: #fff;
         }
+        /* Modal Overlay */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    animation: fadeIn 0.2s ease-out;
+}
+
+/* Modal Box */
+.modal-box {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    max-width: 400px;
+    width: 90%;
+    animation: slideUp 0.3s ease-out;
+}
+
+/* Modal animations */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from { 
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to { 
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Modal content */
+.modal-icon {
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 1rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fef3c7;
+}
+
+.modal-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+    text-align: center;
+}
+
+.modal-message {
+    color: #6b7280;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    line-height: 1.5;
+}
+
+.modal-button {
+    width: 100%;
+    padding: 0.75rem 1.5rem;
+    background: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.modal-button:hover {
+    background: #2563eb;
+}
 
         /* NTA Palette and Legend Styles */
         .not-visited { background-color: #f0f0f0; color: #333; border: 1px solid #ccc; }
@@ -58,6 +143,7 @@
         .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #a8a8a8; border-radius: 3px; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #888; }
+        
     </style>
 </head>
 <body class="text-gray-900">
@@ -192,6 +278,32 @@
             initializeTest();
         }
     });
+    // Add this function before initializeTest()
+function showNoQuestionsModal(filter) {
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay';
+    modal.innerHTML = `
+        <div class="modal-box">
+            <div class="modal-icon">
+                <svg class="w-8 h-8 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+            </div>
+            <h3 class="modal-title">No Questions Available</h3>
+            <p class="modal-message">
+                No <strong>${filter}</strong> questions found for this subject. 
+                Please try a different filter or category.
+            </p>
+            <button class="modal-button">Back to Dashboard</button>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    modal.querySelector('.modal-button').addEventListener('click', () => {
+        window.location.href = 'home.html';
+    });
+}
 
     // ★★★ THIS IS THE ORIGINAL, CORRECT FUNCTION TO SAVE DATA ★★★
     async function saveResultsToSupabase() {
@@ -350,29 +462,150 @@
     }
 
     async function initializeTest() {
-        switchView('loading');
-        const params = new URLSearchParams(window.location.search);
-        currentSubjectId = parseInt(params.get('subject_id'));
-        const subjectName = params.get('subject_name') || 'Mock Test';
-        const count = parseInt(params.get('count') || 10);
-        document.getElementById('header-subject-name').textContent = subjectName;
-        document.getElementById('user-name').textContent = currentUser.email.split('@')[0];
-        const tableName = `questions_${subjectName.toLowerCase().replace(/ /g, '_')}`;
-        try {
-            const { data: allQuestions, error } = await supabaseClient.from(tableName).select('*').limit(count);
-            if (error) throw error;
-            if (allQuestions.length === 0) throw new Error("No questions found.");
-            currentQuestions = allQuestions;
-            startTimer();
-            testState = currentQuestions.map(() => ({ status: 'not-visited', selectedOption: null }));
-            jumpToQuestion(0);
-            switchView('test');
-        } catch (error) {
-            console.error("Error preparing test:", error);
-            alert(`Could not load questions for ${subjectName}. Redirecting...`);
-            window.location.href = 'index.html';
-        }
+  switchView('loading');
+  const params = new URLSearchParams(window.location.search);
+  currentSubjectId = parseInt(params.get('subject_id'));
+  const subjectName = params.get('subject_name') || 'Mock Test';
+  const count = parseInt(params.get('count') || 10);
+  const filter = params.get('filter') || 'all';
+
+  document.getElementById('header-subject-name').textContent = subjectName;
+  document.getElementById('user-name').textContent = currentUser.email.split('@')[0];
+
+  const tableName = `questions_${subjectName.toLowerCase().replace(/ /g, '_')}`;
+
+  try {
+    // --- Step 1: Fetch user history ---
+    const { data: userStatuses, error: statusError } = await supabaseClient
+      .from('user_question_status')
+      .select('question_id, status')
+      .eq('user_id', currentUser.id)
+      .eq('subject_id', currentSubjectId);
+
+    if (statusError) throw statusError;
+    
+
+    // --- Step 2: Get all questions ---
+    const { data: allQuestions, error: qError } = await supabaseClient
+      .from(tableName)
+      .select('*');
+
+    if (qError) throw qError;
+
+    // --- Step 3: Filter based on user performance ---
+    let filtered = allQuestions;
+
+    if (filter === 'incorrect') {
+        const incorrectIds = userStatuses
+            .filter(r => r.status === 'incorrect')
+            .map(r => r.question_id);
+        filtered = allQuestions.filter(q => incorrectIds.includes(q.id));
+    } else if (filter === 'unattempted') {
+        const attemptedIds = userStatuses.map(r => r.question_id);
+        filtered = allQuestions.filter(q => !attemptedIds.includes(q.id));
+    } else if (filter === 'correct') {
+        const correctIds = userStatuses
+            .filter(r => r.status === 'correct')
+            .map(r => r.question_id);
+        filtered = allQuestions.filter(q => correctIds.includes(q.id));
+    } else if (filter === 'all') {
+        filtered = [...allQuestions]; // no filter, include all
     }
+
+    // --- Step 4: Randomize and slice based on count ---
+    if (count && !isNaN(count) && count > 0) {
+        filtered = shuffleArray(filtered).slice(0, count);
+    } else {
+        filtered = shuffleArray(filtered); // "all" case
+    }
+    // After your filter logic (lines ~370-380), add:
+if (filtered.length === 0) {
+    showNoQuestionsModal(filter);
+    return;
+}
+
+
+    // --- Step 4: Randomize and slice ---
+    filtered = shuffleArray(filtered).slice(0, count);
+
+    // --- Step 5: Initialize test ---
+    currentQuestions = filtered;
+    testState = currentQuestions.map(() => ({ status: 'not-visited', selectedOption: null }));
+    startTimer();
+    jumpToQuestion(0);
+    switchView('test');
+  } catch (error) {
+    console.error("Error preparing test:", error);
+    alert(`Could not load questions for ${subjectName}. Redirecting...`);
+    window.location.href = 'index.html';
+  }
+}
+
+// Reuse this shuffle helper
+function shuffleArray(arr) {
+  const copy = [...arr];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
+            // --- Fetch URL parameters ---
+        const urlParams = new URLSearchParams(window.location.search);
+        const subjectId = urlParams.get('subject_id');
+        const subjectName = urlParams.get('subject_name');
+        const filter = urlParams.get('filter') || 'all';
+        const questionCount = parseInt(urlParams.get('count')) || 30;
+
+        // --- Determine question table name ---
+        const tableName = `questions_${subjectName.toLowerCase()}`;
+
+        // --- Load questions based on filter ---
+        async function loadQuestions() {
+        let { data: allQuestions, error } = await supabaseClient
+            .from(tableName)
+            .select('*');
+
+        if (error) {
+            console.error('Error loading questions:', error.message);
+            return [];
+        }
+
+        // Load attempted info (from localStorage)
+        const attempts = JSON.parse(localStorage.getItem('attempts') || '{}');
+
+        let filtered = allQuestions;
+
+        if (filter === 'unattempted') {
+            filtered = allQuestions.filter((q) => !attempts[q.id]);
+        } else if (filter === 'incorrect') {
+            filtered = allQuestions.filter((q) => attempts[q.id]?.status === 'incorrect');
+        }
+
+        // --- Randomize if 'all' filter ---
+        if (filter === 'all') {
+            filtered = shuffleArray(filtered);
+        }
+
+        // --- Limit count if needed ---
+        if (filtered.length > questionCount) {
+            filtered = filtered.slice(0, questionCount);
+        }
+
+        return filtered;
+        }
+
+        // --- Simple array shuffler ---
+        function shuffleArray(arr) {
+        const copy = [...arr];
+        for (let i = copy.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [copy[i], copy[j]] = [copy[j], copy[i]];
+        }
+        return copy;
+        }
+
     
     optionsContainer.addEventListener('change', (e) => {
         const clickedRadio = e.target.closest('.option-radio-input');
