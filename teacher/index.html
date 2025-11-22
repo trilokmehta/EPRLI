@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-R">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ERPLI - Admin Login</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        /* Custom styles for light mode */
+        body {
+            font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #F3F4F6; /* gray-100 */
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen">
+
+    <div class="w-full max-w-md bg-white p-8 rounded-2xl shadow-xl">
+        
+        <h1 class="text-4xl font-bold text-center text-gray-900 mb-8">ERPLI System</h1>
+        
+        <form id="login-form">
+            <div class="mb-4">
+                <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                <input type="email" id="email" required class="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="admin@institute.com">
+            </div>
+            
+            <div class="mb-6">
+                <label for="password" class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                <div class="relative">
+                    <input type="password" id="password" required class="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 pr-12" placeholder="••••••••">
+                    
+                    <button type="button" id="toggle-password" class="absolute inset-y-0 right-0 flex items-center px-4 text-gray-500 hover:text-gray-700">
+                        <svg id="eye-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        <svg id="eye-slash-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 hidden">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.243 4.243l-4.243-4.243" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <button type="submit" id="login-button" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200">
+                Login
+            </button>
+        </form>
+        
+        <p id="auth-error" class="text-red-600 text-center mt-4"></p>
+    </div>
+
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+
+        // 2. Add your Supabase keys here
+        const SUPABASE_URL = 'https://mclizdhmmzckhjnocktz.supabase.co'
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1jbGl6ZGhtbXpja2hqbm9ja3R6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIyNDk5MzUsImV4cCI6MjA3NzgyNTkzNX0.zKvs2XDOvcJfb_mCDHOMsJwRKvUViWWTjZRcOKExAfI'
+
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+        // 3. Get the login form elements
+        const loginForm = document.getElementById('login-form');
+        const authError = document.getElementById('auth-error');
+
+        // START: Logic for password toggle (No changes needed)
+        const passwordInput = document.getElementById('password');
+        const togglePasswordButton = document.getElementById('toggle-password');
+        const eyeIcon = document.getElementById('eye-icon');
+        const eyeSlashIcon = document.getElementById('eye-slash-icon');
+
+        togglePasswordButton.addEventListener('click', () => {
+            const isPassword = passwordInput.type === 'password';
+            passwordInput.type = isPassword ? 'text' : 'password';
+            eyeIcon.classList.toggle('hidden', isPassword);
+            eyeSlashIcon.classList.toggle('hidden', !isPassword);
+        });
+        // END: Logic for password toggle
+
+        // 4. Add the submit button logic (No changes needed)
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault(); 
+            authError.textContent = ''; 
+
+            const email = document.getElementById('email').value;
+            const password = passwordInput.value;
+
+            // 5. Sign in the user with Supabase
+            const { data: loginData, error: loginError } = await supabase.auth.signInWithPassword({
+                email: email,
+                password: password,
+            });
+
+            if (loginError) {
+                console.error('Login error:', loginError.message);
+                authError.textContent = 'Failed to login: ' + loginError.message;
+                return;
+            }
+
+            // 6. Login was successful. Now, check their role from 'profiles' table.
+            const user = loginData.user;
+            const { data: profile, error: profileError } = await supabase
+                .from('profiles')
+                .select('role')
+                .eq('id', user.id)
+                .single();
+
+            if (profileError) {
+                console.error('Profile error:', profileError.message);
+                authError.textContent = 'Error finding user profile. Please contact support.';
+                await supabase.auth.signOut(); 
+                return;
+            }
+
+            // 7. Redirect them based on their role
+            if (profile.role === 'admin') {
+                window.location.href = 'admin_dashboard.html';
+            } else if (profile.role === 'teacher') {
+                window.location.href = 'teacher_dashboard.html';
+            } else {
+                authError.textContent = 'You do not have a valid role assigned.';
+                await supabase.auth.signOut();
+            }
+        });
+    </script>
+</body>
+</html>
