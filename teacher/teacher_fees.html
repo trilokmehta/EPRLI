@@ -748,7 +748,16 @@
             setTimeout(() => { successModal.classList.remove('phonepe-mode'); }, 2500);
 
             const message = `*Payment Receipt* ✅\n\nDear Parent,\nWe have successfully received payment for *${currentStudentName}*.\n\n💰 *Amount:* ${formatter.format(amount)}\n📅 *Date:* ${date}\n🏫 *Institute:* ${instituteDetails.name}\n\nThank you!`;
-            const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
+            
+            // --- NEW: Dynamic WhatsApp Link with Student Phone ---
+            let cleanPhone = currentStudentPhone ? currentStudentPhone.replace(/[^\d]/g, '') : '';
+            // Auto-add '91' if it's a standard 10-digit Indian number
+            if (cleanPhone.length === 10) cleanPhone = '91' + cleanPhone; 
+            
+            const baseUrl = cleanPhone ? `https://wa.me/${cleanPhone}` : `https://wa.me/`;
+            const url = `${baseUrl}?text=${encodeURIComponent(message)}`;
+            // -----------------------------------------------------
+
             document.getElementById('whatsapp-share-btn').onclick = () => window.open(url, '_blank');
             
             // --- NEW: Share PDF Logic ---
