@@ -150,6 +150,22 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
+        /* --- TOOLTIP STYLES --- */
+        .tooltip-container { position: relative; display: inline-block; margin-left: 4px; }
+        .tooltip-icon { cursor: pointer; color: #9CA3AF; transition: color 0.2s; }
+        .tooltip-icon:hover { color: #6B7280; }
+        .tooltip-content { 
+            visibility: hidden; opacity: 0; width: 200px; background-color: #1F2937; color: #fff; 
+            text-align: center; border-radius: 6px; padding: 8px; position: absolute; z-index: 10; 
+            bottom: 125%; left: 50%; margin-left: -100px; font-size: 0.75rem; font-weight: normal;
+            transition: opacity 0.2s; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        .tooltip-content::after {
+            content: ""; position: absolute; top: 100%; left: 50%; margin-left: -5px;
+            border-width: 5px; border-style: solid; border-color: #1F2937 transparent transparent transparent;
+        }
+        .tooltip-container:hover .tooltip-content { visibility: visible; opacity: 1; }
+
     </style>
 </head>
 <body class="page-container">
@@ -229,6 +245,27 @@
                             </select>
                         </div>
                     </div>
+                    
+                    <!-- Student Info Card -->
+                    <div id="student-info-card" class="hidden bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg shadow-sm">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-800" id="info-student-name">Student Name</h3>
+                                <p class="text-sm text-gray-600 mt-1">
+                                    <span class="font-medium">Batch:</span> <span id="info-batch-name">Batch A</span>
+                                </p>
+                                <p class="text-sm text-gray-600">
+                                    <span class="font-medium">Phone:</span> <span id="info-phone">N/A</span>
+                                </p>
+                                 <p class="text-sm text-gray-600">
+                                    <span class="font-medium">Email:</span> <span id="info-email">N/A</span>
+                                </p>
+                            </div>
+                            <div class="text-right">
+                                <span id="info-status-badge" class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Active</span>
+                            </div>
+                        </div>
+                    </div>
 
                     <div id="payment-container" class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hidden">
                         
@@ -236,6 +273,9 @@
                             <h2 class="text-lg font-semibold text-gray-900">Record Payment</h2>
                             <span id="payment-type-badge" class="px-3 py-1 text-sm font-medium rounded-full bg-gray-100 text-gray-800">New Payment</span>
                         </div>
+
+                        <!-- WARNING & ACTION CONTAINER -->
+                        <div id="warning-container" class="hidden mb-6 space-y-4"></div>
 
                         <form id="one-time-form" class="space-y-4">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -287,22 +327,37 @@
                         <h3 class="text-xl font-semibold text-gray-900 mb-4">Fee Summary</h3>
                         
                         <div class="space-y-2 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                            <div class="flex justify-between text-sm">
-                                <span class="text-gray-500">Total Fee:</span>
+                            <div class="flex justify-between text-sm items-center">
+                                <div class="flex items-center">
+                                    <span class="text-gray-500">Total Fee:</span>
+                                    <div class="tooltip-container">
+                                        <svg class="w-4 h-4 tooltip-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                        <div class="tooltip-content">Student will pay this much amount throughout the course, from start to end.</div>
+                                    </div>
+                                </div>
                                 <span id="total-course-fee" class="font-medium text-gray-700">₹0.00</span>
                             </div>
-                            <div class="flex justify-between text-sm">
-                                <span class="text-gray-500">Fee Paid:</span>
+                            <div class="flex justify-between text-sm items-center">
+                                <div class="flex items-center">
+                                    <span class="text-gray-500">Fee Paid:</span>
+                                    <div class="tooltip-container">
+                                        <svg class="w-4 h-4 tooltip-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                        <div class="tooltip-content">Total monthly fees paid by the student so far.</div>
+                                    </div>
+                                </div>
                                 <span id="total-paid" class="font-medium text-green-600">₹0.00</span>
                             </div>
-                            <!-- Advance Credit Line -->
-                            <div class="flex justify-between text-sm">
-                                <span class="text-gray-500">Advance/Credit:</span>
+                            <div class="flex justify-between text-sm items-center">
+                                <div class="flex items-center">
+                                    <span class="text-gray-500">Advance/Credit:</span>
+                                    <div class="tooltip-container">
+                                        <svg class="w-4 h-4 tooltip-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                        <div class="tooltip-content">Amount paid in advance for the course.</div>
+                                    </div>
+                                </div>
                                 <span id="total-advance" class="font-medium text-blue-600">₹0.00</span>
                             </div>
-                            <!-- Divider -->
                             <div class="border-t border-gray-200 my-1"></div>
-                            
                             <div class="flex justify-between text-base font-semibold">
                                 <span class="text-gray-900">Net Balance:</span>
                                 <span id="total-balance" class="text-gray-900">₹0.00</span>
@@ -323,6 +378,7 @@
                                             <th class="py-2 px-2 text-left text-xs font-medium text-gray-500">Date</th>
                                             <th class="py-2 px-2 text-left text-xs font-medium text-gray-500">Amount</th>
                                             <th class="py-2 px-2 text-left text-xs font-medium text-gray-500">Type</th>
+                                            <th class="py-2 px-2 text-right text-xs font-medium text-gray-500">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody id="payment-history-body" class="divide-y divide-gray-200">
@@ -336,70 +392,97 @@
         </main>
     </div>
     
-    <!-- Updated Success Modal -->
+    <!-- Updated Success Modal with New Design -->
     <div id="success-modal" class="modal-overlay">
-        <div class="modal-content text-center p-8 rounded-2xl shadow-2xl max-w-sm w-full relative bg-white overflow-hidden"> 
+        <div class="modal-content text-center p-6 rounded-3xl shadow-2xl max-w-sm w-full relative bg-white overflow-hidden flex flex-col items-center">
             
-            <!-- 1. The Animation Container (Green Screen) -->
-            <div class="success-animation-container mb-2">
+            <!-- 1. Animation/Icon -->
+            <div class="success-animation-container mb-4">
                 <svg class="checkmark-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
                     <circle class="circle-path" cx="50" cy="50" r="45"/>
                     <path class="check-path" d="M30 52 L45 67 L70 35"/>
                 </svg>
             </div>
-            
-            <!-- 2. Green Screen Text -->
-            <div id="phonepe-text-container">
+
+            <!-- Green Screen Text (Keep for animation logic) -->
+             <div id="phonepe-text-container">
                 <h2 class="text-xl font-bold mb-1">Payment Successful</h2>
                 <h1 id="green-screen-amount" class="text-4xl font-bold"></h1>
             </div>
 
-            <!-- 3. The White Card Content -->
-            <div id="success-details-card" class="relative z-10">
-                <h3 class="text-2xl font-bold text-gray-900 mb-1">Payment Received!</h3>
+            <!-- Main Content -->
+            <div id="success-details-card" class="relative z-10 w-full flex flex-col items-center">
                 
-                <div class="py-6">
-                    <p class="text-xs text-gray-500 uppercase tracking-widest font-semibold mb-1">Total Amount</p>
-                    <h1 id="success-amount" class="text-5xl font-extrabold text-gray-900 tracking-tight"></h1>
-                    
-                    <div class="mt-2 flex flex-col items-center justify-center gap-1">
-                        <p class="text-sm text-gray-500">
-                            Paid by <span id="success-student-name" class="font-semibold text-gray-800"></span>
-                        </p>
-                        <!-- Copy Phone Number Button -->
-                        <button id="copy-phone-btn" class="group flex items-center gap-2 px-3 py-1 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-full transition-all active:scale-95" title="Click to Copy">
-                            <svg class="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
-                            <span id="success-student-phone" class="text-xs font-mono font-medium text-gray-600 group-hover:text-gray-900">Loading...</span>
-                            <!-- Copy Icon -->
-                            <svg id="copy-icon-svg" class="w-3 h-3 text-gray-400 group-hover:text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
-                            <!-- Check Icon -->
-                            <svg id="check-icon-svg" class="w-3 h-3 text-green-500 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                        </button>
-                    </div>
+                <!-- Title -->
+                <h3 class="text-2xl font-bold text-gray-900 mb-4">Payment Received!</h3>
+                
+                <!-- Amount Section -->
+                <div class="mb-1">
+                    <p class="text-xs text-gray-500 uppercase tracking-wider font-bold">TOTAL AMOUNT</p>
                 </div>
+                <h1 id="success-amount" class="text-5xl font-black text-gray-900 mb-2 tracking-tight"></h1>
                 
-                <!-- Buttons Stack -->
-                <div class="flex flex-col gap-3">
-                    <button id="whatsapp-share-btn" class="w-full flex justify-center items-center gap-2 px-4 py-3.5 bg-[#25D366] hover:bg-[#20bd5a] text-white rounded-xl font-bold transition-all transform hover:-translate-y-0.5 shadow-lg shadow-green-100">
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.008-.57-.008-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
-                        Share Receipt (Text)
+                <!-- Paid By -->
+                <p class="text-sm text-gray-500 mb-3">
+                    Paid by <span id="success-student-name" class="font-bold text-gray-900"></span>
+                </p>
+
+                <!-- Phone Pill with Copy -->
+                <button id="copy-phone-btn" class="flex items-center gap-2 px-4 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors mb-6 group">
+                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+                    <span id="success-student-phone" class="text-sm font-medium text-gray-600"></span>
+                    <!-- Copy Icon -->
+                    <svg id="copy-icon-svg" class="w-4 h-4 text-gray-400 group-hover:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                    <!-- Check Icon -->
+                    <svg id="check-icon-svg" class="w-4 h-4 text-green-500 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                </button>
+
+                <!-- Action Grid -->
+                <div class="grid grid-cols-2 gap-3 w-full mb-3">
+                    <!-- Text Student -->
+                    <button id="whatsapp-share-btn-student" class="flex flex-col items-center justify-center py-3 px-2 bg-[#25D366] hover:bg-[#20bd5a] text-white rounded-xl shadow-sm transition-transform active:scale-95">
+                        <div class="flex items-center gap-1.5">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.008-.57-.008-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+                            <span class="text-sm font-bold">Text Student</span>
+                        </div>
                     </button>
                     
-                    <!-- NEW BUTTON: Share PDF -->
-                    <button id="share-pdf-btn" class="w-full flex justify-center items-center gap-2 px-4 py-3.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition-all transform hover:-translate-y-0.5 shadow-lg shadow-blue-100">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg>
-                        Share PDF File
+                    <!-- Text Parent -->
+                    <button id="whatsapp-share-btn-parent" class="flex flex-col items-center justify-center py-3 px-2 bg-[#25D366] hover:bg-[#20bd5a] text-white rounded-xl shadow-sm transition-transform active:scale-95">
+                        <div class="flex items-center gap-1.5">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.008-.57-.008-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+                            <span class="text-sm font-bold">Text Parent</span>
+                        </div>
                     </button>
 
-                    <button id="download-receipt-btn" class="w-full flex justify-center items-center gap-2 px-4 py-3.5 bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-700 rounded-xl font-semibold transition-colors">
-                        <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                        Download PDF
+                    <!-- PDF Student -->
+                    <button id="share-pdf-btn-student" class="flex flex-col items-center justify-center py-3 px-2 bg-[#2563EB] hover:bg-[#1d4ed8] text-white rounded-xl shadow-sm transition-transform active:scale-95">
+                        <div class="flex items-center gap-1.5">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg> 
+                            <span class="text-sm font-bold">PDF to Student</span>
+                        </div>
+                    </button>
+
+                    <!-- PDF Parent -->
+                    <button id="share-pdf-btn-parent" class="flex flex-col items-center justify-center py-3 px-2 bg-[#2563EB] hover:bg-[#1d4ed8] text-white rounded-xl shadow-sm transition-transform active:scale-95">
+                         <div class="flex items-center gap-1.5">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg>
+                            <span class="text-sm font-bold">PDF to Parent</span>
+                        </div>
                     </button>
                 </div>
-                
-                <button id="close-success-modal" class="mt-6 text-sm text-gray-400 hover:text-gray-600 font-medium transition-colors">
+
+                <!-- Download PDF (Outline Button) -->
+                <button id="download-receipt-btn" class="w-full flex items-center justify-center gap-2 py-3 border border-gray-200 rounded-xl text-gray-700 hover:bg-gray-50 font-bold transition-colors mb-4">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                    Download PDF
+                </button>
+
+                <!-- Done Link -->
+                <button id="close-success-modal" class="text-gray-400 hover:text-gray-600 font-medium text-sm transition-colors">
                     Done
                 </button>
+
             </div>
         </div>
     </div>
@@ -418,8 +501,13 @@
         let currentStudentName = '';
         let currentStudentType = 'one_time'; // Defaults
         let currentStudentPhone = ''; // For copy logic
+        let currentStudentEmail = ''; // New: email logic
         let instituteDetails = null;
         let isSubmitting = false;
+        let currentMonthlyFee = 0; // Store monthly fee for logic
+        let currentStudentHistory = []; // Store history to avoid re-fetching
+        let currentAdvanceCredit = 0; // Store advance credit for adjustment logic
+        let currentFatherPhone = ''; // New: Store father's phone
 
         const formatter = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 0 });
         
@@ -504,7 +592,7 @@
             
             const ids = assigns.map(a => a.batch_id);
             const { data: batches } = await supabase.from('batches')
-                .select('id, name, courses(is_online, payment_type)')
+                .select('id, name, courses(is_online, payment_type, is_free, sale_price, full_price)')
                 .in('id', ids).eq('institute_id', userProfile.institute_id);
             
             batchSelect.innerHTML = '<option value="">Select Batch</option>';
@@ -512,6 +600,10 @@
                 if (!b.courses.is_online) {
                     const opt = new Option(b.name, b.id);
                     opt.dataset.coursePaymentType = b.courses?.payment_type || 'one_time'; 
+                    // Add new datasets for Pricing logic
+                    opt.dataset.isFree = b.courses.is_free;
+                    opt.dataset.salePrice = b.courses.sale_price;
+                    opt.dataset.fullPrice = b.courses.full_price;
                     batchSelect.appendChild(opt);
                 }
             });
@@ -530,11 +622,12 @@
             studentSelect.innerHTML = '<option>Loading...</option>';
             paymentContainer.classList.add('hidden');
             document.getElementById('student-fee-details').classList.add('hidden');
+            document.getElementById('student-info-card').classList.add('hidden');
 
-            // Now fetching Phone as well
+            // Fetch students including monthly_fee_amount and father phone
             const { data: students, error } = await supabase
                 .from('students')
-                .select('id, full_name, payment_type, total_fee_due, phone')
+                .select('id, full_name, payment_type, total_fee_due, monthly_fee_amount, phone, email, father_phone') 
                 .eq('batch_id', batchId)
                 .eq('institute_id', userProfile.institute_id)
                 .order('full_name');
@@ -546,7 +639,10 @@
                 const opt = new Option(s.full_name, s.id);
                 opt.dataset.type = s.payment_type; 
                 opt.dataset.fee = s.total_fee_due;
+                opt.dataset.monthly = s.monthly_fee_amount || 0;
                 opt.dataset.phone = s.phone || ''; // Store phone
+                opt.dataset.email = s.email || ''; // Store email
+                opt.dataset.fatherPhone = s.father_phone || ''; // Store father's phone
                 studentSelect.appendChild(opt);
             });
             studentSelect.disabled = false;
@@ -557,16 +653,42 @@
             const opt = studentSelect.options[studentSelect.selectedIndex];
             currentStudentId = opt.value;
             currentStudentName = opt.text;
-            currentStudentPhone = opt.dataset.phone; // Capture phone
+            currentStudentPhone = opt.dataset.phone; 
+            currentStudentEmail = opt.dataset.email;
+            currentFatherPhone = opt.dataset.fatherPhone; // Store globally
 
             if (!currentStudentId) return;
 
             paymentContainer.classList.remove('hidden');
             document.getElementById('student-fee-details').classList.remove('hidden');
             oneTimeForm.classList.remove('hidden'); 
+            document.getElementById('warning-container').classList.add('hidden');
+
+            // --- NEW: Update Profile Card ---
+            const batchName = batchSelect.options[batchSelect.selectedIndex].text;
+            document.getElementById('info-student-name').textContent = currentStudentName;
+            document.getElementById('info-batch-name').textContent = batchName;
+            document.getElementById('info-phone').textContent = currentStudentPhone || 'N/A';
+            document.getElementById('info-email').textContent = currentStudentEmail || 'N/A';
+            document.getElementById('student-info-card').classList.remove('hidden');
+            // --------------------------------
 
             const batchOpt = batchSelect.options[batchSelect.selectedIndex];
             const batchPaymentType = batchOpt.dataset.coursePaymentType;
+            
+            // 1. Calculate Course Price Logic from Batch Option Data
+            let courseFee = 0;
+            const isFree = (batchOpt.dataset.isFree === 'true');
+            const salePrice = parseFloat(batchOpt.dataset.salePrice) || 0;
+            const fullPrice = parseFloat(batchOpt.dataset.fullPrice) || 0;
+
+            if (isFree) {
+                courseFee = 0;
+            } else if (salePrice > 0) {
+                courseFee = salePrice;
+            } else {
+                courseFee = fullPrice;
+            }
 
             // Check if installments exist
             const { count } = await supabase
@@ -576,6 +698,14 @@
 
             // Dynamic Dropdown Logic
             const feeOption = document.querySelector('#payment-category option[value="fee"]');
+            const amountInput = document.getElementById('amount');
+            
+            // Get student specific overrides
+            currentMonthlyFee = parseFloat(opt.dataset.monthly) || 0;
+            const studentTotalDue = parseFloat(opt.dataset.fee) || 0;
+
+            // Reset Payment category to default "fee" whenever user changes student
+            document.getElementById('payment-category').value = 'fee';
 
             if (batchPaymentType === 'monthly' || (count && count > 0)) {
                  currentStudentType = 'monthly'; // Mark student as monthly
@@ -590,9 +720,35 @@
             }
             
             document.getElementById('payment-date').value = new Date().toISOString().split('T')[0];
-            loadFeeStats(parseFloat(opt.dataset.fee));
-            loadTransactionHistory();
+            
+            // Pass the calculated courseFee into loadFeeStats to handle the final autofill logic
+            await loadFeeStats(studentTotalDue, courseFee);
+            await loadTransactionHistory();
+            
+            // After loading history and stats, check for warnings
+            updateWarnings();
         }
+
+        // --- DROPDOWN LISTENER ---
+        document.getElementById('payment-category').addEventListener('change', function() {
+            const category = this.value;
+            const amountInput = document.getElementById('amount');
+            const balanceText = document.getElementById('total-balance').textContent;
+            // Convert currency string "₹5,000.00" -> number 5000
+            const balanceVal = parseFloat(balanceText.replace(/[^0-9.-]+/g,"")) || 0;
+
+            if (category === 'fee') {
+                // Logic: If Monthly student, default to monthly fee. Else default to Remaining Balance.
+                if (currentStudentType === 'monthly') {
+                    amountInput.value = currentMonthlyFee > 0 ? currentMonthlyFee : '';
+                } else {
+                    amountInput.value = balanceVal > 0 ? balanceVal : '';
+                }
+            } else {
+                // Advance: Default to empty
+                amountInput.value = '';
+            }
+        });
 
         // --- FORM SUBMIT ---
         oneTimeForm.addEventListener('submit', async (e) => {
@@ -637,15 +793,20 @@
             else {
                 showSuccessModal(amount, date);
                 oneTimeForm.reset();
+                // Reset UI state after success
+                document.getElementById('payment-category').value = 'fee'; // Reset dropdown
                 document.getElementById('payment-date').value = new Date().toISOString().split('T')[0];
-                loadFeeStats();
-                loadTransactionHistory();
+                
+                // We need to re-trigger stats logic to update balance, passing 0 as courseFee is acceptable since balance calculation relies on DB
+                await loadFeeStats(); 
+                await loadTransactionHistory();
+                updateWarnings();
             }
             setButtonLoading(btn, false);
         });
 
         // --- FEE STATS (WITH CORRECT MATH) ---
-        async function loadFeeStats(feeDueOverride) {
+        async function loadFeeStats(feeDueOverride = 0, courseFeeContext = 0) {
             // Fetch 'advance_credit' along with fee details
             const { data } = await supabase
                 .from('students')
@@ -653,10 +814,14 @@
                 .eq('id', currentStudentId).single();
             if (!data) return;
             
+            // Use override if provided (from dropdown dataset), else DB value
             const total = feeDueOverride || data.total_fee_due || 0;
             const paid = data.total_fee_paid || 0;
             const advance = data.advance_credit || 0;
             
+            // Use for global logic later
+            currentAdvanceCredit = advance; 
+
             // Calculate Net Balance correctly
             const balance = total - paid - advance;
             
@@ -667,6 +832,36 @@
             if(advanceEl) advanceEl.textContent = formatter.format(advance);
             
             document.getElementById('total-balance').textContent = formatter.format(balance);
+
+            // --- SMART AUTOFILL LOGIC (Run after balance is calculated) ---
+            const amountInput = document.getElementById('amount');
+            const category = document.getElementById('payment-category').value;
+
+            // Only autofill if we are in "Fee" mode
+            if (category === 'fee') {
+                if (currentStudentType === 'monthly') {
+                    // If monthly, use the specific monthly fee set for the student
+                    // If not set, FALLBACK to the Course Price (courseFeeContext)
+                    let fillAmount = currentMonthlyFee > 0 ? currentMonthlyFee : courseFeeContext;
+                    amountInput.value = fillAmount > 0 ? fillAmount : '';
+                    // Also update global var in case dropdown switches back and forth
+                    if (currentMonthlyFee === 0) currentMonthlyFee = courseFeeContext; 
+                } else {
+                    // For One-Time:
+                    // 1. If student has a balance, prioritize filling that.
+                    if (balance > 0) {
+                        amountInput.value = balance;
+                    } 
+                    // 2. If balance is 0 (or weird), fallback to the generic Course Fee we fetched from Batch
+                    else if (courseFeeContext > 0) {
+                        amountInput.value = courseFeeContext;
+                    }
+                    // 3. If everything is 0, it stays empty or 0
+                    else {
+                        amountInput.value = '';
+                    }
+                }
+            }
         }
 
         // --- HISTORY (WITH CORRECT LABELS) ---
@@ -675,8 +870,12 @@
             tbody.innerHTML = '<tr><td colspan="3" class="text-center py-2">Loading...</td></tr>';
             
             const { data } = await supabase.from('fees')
-                .select('*').eq('student_id', currentStudentId).order('date_paid', { ascending: false });
+                .select('*')
+                .eq('student_id', currentStudentId)
+                .order('date_paid', { ascending: false });
             
+            currentStudentHistory = data || []; // Save for warning check
+
             tbody.innerHTML = '';
             if (!data || data.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="3" class="text-center py-2 text-gray-500">No history</td></tr>';
@@ -702,10 +901,136 @@
                         <td class="py-2 px-2 text-xs font-medium text-green-600">${formatter.format(p.amount_paid)}</td>
                         <td class="py-2 px-2 text-xs text-gray-500 flex items-center justify-between">
                             ${typeHtml}
-                            <button onclick="generateReceiptPDF('${pJson}')" class="text-blue-600 hover:underline ml-2">📄</button>
+                            <!-- Changed to class-based trigger with data attribute -->
+                            <button class="text-blue-600 hover:underline ml-2 btn-download-pdf" data-payment="${pJson}">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                            </button>
                         </td>
                     </tr>`;
             });
+        }
+
+        // Add listener for PDF download in history table
+        document.getElementById('payment-history-body').addEventListener('click', (e) => {
+            const btn = e.target.closest('.btn-download-pdf');
+            if (btn) {
+                const json = btn.dataset.payment;
+                generateReceiptPDF(json);
+            }
+        });
+
+        // --- WARNING SYSTEM (UPDATED WITH ADVANCE LOGIC) ---
+        function updateWarnings() {
+            const container = document.getElementById('warning-container');
+            container.innerHTML = ''; 
+            let hasWarnings = false;
+
+            // 1. Check Total Fee = 0
+            const totalFeeText = document.getElementById('total-course-fee').textContent;
+            const totalFeeVal = parseFloat(totalFeeText.replace(/[^0-9.-]+/g,"")) || 0;
+            
+            if (totalFeeVal === 0 && currentStudentType !== 'monthly') {
+                const div = document.createElement('div');
+                div.className = "bg-red-50 border-l-4 border-red-500 p-4 flex items-start";
+                div.innerHTML = `
+                    <div class="flex-shrink-0"><svg class="h-5 w-5 text-red-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg></div>
+                    <div class="ml-3"><p class="text-sm text-red-700 font-medium">Warning: Total Fee is set to ₹0.</p><p class="text-xs text-red-600">Please check if the student was assigned the correct course/fee.</p></div>
+                `;
+                container.appendChild(div);
+                hasWarnings = true;
+            }
+
+            // 2. Check Monthly Payment Status
+            if (currentStudentType === 'monthly') {
+                const now = new Date();
+                const currentMonth = now.getMonth(); 
+                const currentYear = now.getFullYear();
+
+                const paidThisMonth = currentStudentHistory.some(p => {
+                    if (p.is_advance) return false; 
+                    const pDate = new Date(p.date_paid);
+                    return pDate.getMonth() === currentMonth && pDate.getFullYear() === currentYear;
+                });
+
+                // Case A: Already Paid
+                if (paidThisMonth) {
+                    const div = document.createElement('div');
+                    div.className = "bg-yellow-50 border-l-4 border-yellow-400 p-4 flex items-start";
+                    div.innerHTML = `
+                        <div class="flex-shrink-0"><svg class="h-5 w-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg></div>
+                        <div class="ml-3"><p class="text-sm text-yellow-700 font-medium">Fee already paid for this month.</p><p class="text-xs text-yellow-600">A payment was recorded for ${new Date().toLocaleString('default', { month: 'long' })}.</p></div>
+                    `;
+                    container.appendChild(div);
+                    hasWarnings = true;
+                } 
+                // Case B: Not Paid yet, but has Advance Credit covers it
+                else if (currentAdvanceCredit >= currentMonthlyFee && currentMonthlyFee > 0) {
+                    const div = document.createElement('div');
+                    div.className = "bg-green-50 border-l-4 border-green-500 p-4 flex items-start justify-between";
+                    div.innerHTML = `
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0"><svg class="h-5 w-5 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg></div>
+                            <div class="ml-3">
+                                <p class="text-sm text-green-700 font-medium">Credit Available</p>
+                                <p class="text-xs text-green-600">Student has sufficient advance credit (₹${currentAdvanceCredit}) to cover this month's fee (₹${currentMonthlyFee}).</p>
+                            </div>
+                        </div>
+                        <button id="btn-pay-from-advance" class="ml-4 bg-green-600 hover:bg-green-700 text-white text-xs font-bold py-2 px-3 rounded">
+                            Pay from Advance
+                        </button>
+                    `;
+                    container.appendChild(div);
+                    
+                    // Attach Listener
+                    document.getElementById('btn-pay-from-advance').addEventListener('click', async (e) => {
+                        e.preventDefault();
+                        const btn = e.target;
+                        btn.textContent = "Processing...";
+                        btn.disabled = true;
+                        
+                        // 1. Deduct Credit from student profile
+                        const { error: updateErr } = await supabase
+                            .from('students')
+                            .update({ 
+                                advance_credit: currentAdvanceCredit - currentMonthlyFee
+                            })
+                            .eq('id', currentStudentId);
+                            
+                        if(updateErr) { alert("Error updating credit"); btn.disabled = false; return; }
+                        
+                        // 2. Log Fee via RPC (Standard secure method)
+                        const { error: insertErr } = await supabase.rpc('add_fee_payment', {
+                            in_student_id: currentStudentId,
+                            in_institute_id: userProfile.institute_id,
+                            in_admin_id: currentUser.id,
+                            in_amount: currentMonthlyFee,
+                            in_date: new Date().toISOString().split('T')[0],
+                            in_notes: 'Auto-deducted from Advance Credit for ' + new Date().toLocaleString('default', { month: 'long' }),
+                            in_payment_method: 'Advance Adjustment'
+                        });
+                            
+                        if(insertErr) { 
+                            alert("Error logging fee: " + insertErr.message); 
+                            btn.disabled = false; 
+                            return; 
+                        }
+                        
+                        alert("Fee adjusted successfully!");
+                        // Refresh everything
+                        await loadFeeStats(); 
+                        await loadTransactionHistory();
+                        updateWarnings();
+                    });
+                    
+                    hasWarnings = true;
+                }
+            }
+
+            if (hasWarnings) {
+                container.classList.remove('hidden');
+            } else {
+                container.classList.add('hidden');
+            }
         }
         
         // --- SUCCESS MODAL (NEW UI + COPY PHONE) ---
@@ -747,28 +1072,50 @@
             
             setTimeout(() => { successModal.classList.remove('phonepe-mode'); }, 2500);
 
-            const message = `*Payment Receipt* ✅\n\nDear Parent,\nWe have successfully received payment for *${currentStudentName}*.\n\n💰 *Amount:* ${formatter.format(amount)}\n📅 *Date:* ${date}\n🏫 *Institute:* ${instituteDetails.name}\n\nThank you!`;
+            // Message Templates
+            const studentMessage = `*Payment Receipt* ✅\n\nDear Student,\nWe have successfully received your payment.\n\n💰 *Amount:* ${formatter.format(amount)}\n📅 *Date:* ${date}\n🏫 *Institute:* ${instituteDetails.name}\n\nThank you!`;
+            const parentMessage = `*Payment Receipt* ✅\n\nDear Parent,\nWe have successfully received payment for *${currentStudentName}*.\n\n💰 *Amount:* ${formatter.format(amount)}\n📅 *Date:* ${date}\n🏫 *Institute:* ${instituteDetails.name}\n\nThank you!`;
             
             // --- NEW: Dynamic WhatsApp Link with Student Phone ---
             let cleanPhone = currentStudentPhone ? currentStudentPhone.replace(/[^\d]/g, '') : '';
-            // Auto-add '91' if it's a standard 10-digit Indian number
-            if (cleanPhone.length === 10) cleanPhone = '91' + cleanPhone; 
+            if (cleanPhone.length === 10) cleanPhone = '91' + cleanPhone;
             
-            const baseUrl = cleanPhone ? `https://wa.me/${cleanPhone}` : `https://wa.me/`;
-            const url = `${baseUrl}?text=${encodeURIComponent(message)}`;
-            // -----------------------------------------------------
+            // --- NEW: Dynamic WhatsApp Link with Parent Phone ---
+            let cleanParentPhone = currentFatherPhone ? currentFatherPhone.replace(/[^\d]/g, '') : '';
+            if (cleanParentPhone.length === 10) cleanParentPhone = '91' + cleanParentPhone; 
+            
+            // Button 1: Share with Student
+            document.getElementById('whatsapp-share-btn-student').onclick = () => {
+                const target = cleanPhone ? `https://wa.me/${cleanPhone}` : `https://wa.me/`;
+                window.open(`${target}?text=${encodeURIComponent(studentMessage)}`, '_blank');
+            };
 
-            document.getElementById('whatsapp-share-btn').onclick = () => window.open(url, '_blank');
+            // Button 2: Share with Parent
+            document.getElementById('whatsapp-share-btn-parent').onclick = () => {
+                const target = cleanParentPhone ? `https://wa.me/${cleanParentPhone}` : `https://wa.me/`;
+                window.open(`${target}?text=${encodeURIComponent(parentMessage)}`, '_blank');
+            };
             
-            // --- NEW: Share PDF Logic ---
-            document.getElementById('share-pdf-btn').onclick = async () => {
-                const btn = document.getElementById('share-pdf-btn');
+            // --- SHARE PDF LOGIC FOR STUDENT ---
+            document.getElementById('share-pdf-btn-student').onclick = async () => {
+                const btn = document.getElementById('share-pdf-btn-student');
                 const originalText = btn.innerHTML;
                 btn.innerHTML = 'Generating...';
-                
+                await handleSharePDF(btn, originalText, cleanPhone, studentMessage);
+            };
+
+            // --- SHARE PDF LOGIC FOR PARENT ---
+            document.getElementById('share-pdf-btn-parent').onclick = async () => {
+                const btn = document.getElementById('share-pdf-btn-parent');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = 'Generating...';
+                await handleSharePDF(btn, originalText, cleanParentPhone, parentMessage);
+            };
+            
+            // Helper function to handle PDF sharing
+            async function handleSharePDF(btn, originalText, phoneNumber, messageText) {
                 try {
                     const mockPayment = { amount_paid: amount, date_paid: date, id: "New" };
-                    // Call PDF generator but ask for blob instead of save
                     const pdfBlob = await generateReceiptPDF(encodeURIComponent(JSON.stringify(mockPayment)), true);
                     
                     if (navigator.share && navigator.canShare && navigator.canShare({ files: [new File([pdfBlob], 'receipt.pdf', { type: 'application/pdf' })] })) {
@@ -776,10 +1123,10 @@
                         await navigator.share({
                             files: [file],
                             title: 'Payment Receipt',
-                            text: message
+                            text: messageText
                         });
                     } else {
-                        // Fallback: Download it and tell user
+                        // Fallback: Download + Open WA
                         const url = URL.createObjectURL(pdfBlob);
                         const a = document.createElement('a');
                         a.href = url;
@@ -788,7 +1135,9 @@
                         a.click();
                         document.body.removeChild(a);
                         alert("PDF Downloaded. Please attach it manually in WhatsApp.");
-                        window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
+                        
+                        const target = phoneNumber ? `https://wa.me/${phoneNumber}` : `https://wa.me/`;
+                        window.open(`${target}?text=${encodeURIComponent(messageText)}`, '_blank');
                     }
                 } catch (error) {
                     console.error("Sharing failed", error);
@@ -796,8 +1145,7 @@
                 } finally {
                     btn.innerHTML = originalText;
                 }
-            };
-            // ----------------------------
+            }
             
             document.getElementById('download-receipt-btn').onclick = () => {
                 const mockPayment = { amount_paid: amount, date_paid: date, id: "New" };
@@ -812,9 +1160,6 @@
             const payment = JSON.parse(decodeURIComponent(paymentJson));
             const doc = new jsPDF();
             
-            // ... (Keep ALL PDF Generation Logic exactly as is) ...
-            // ... (Copy everything from previous file until doc.save line) ...
-            
             const batchDropdown = document.getElementById('batch-select');
             const batchName = batchDropdown.options[batchDropdown.selectedIndex]?.text || "N/A";
             const balanceText = document.getElementById('total-balance').textContent || "₹0.00";
@@ -825,76 +1170,180 @@
             else if(isInstallment || currentStudentType === 'monthly') description = "Monthly Tuition Fee";
             else description = "One-Time Tuition Fee";
 
-            const brandColor = [30, 58, 138]; const accentColor = [243, 244, 246]; const textColor = [55, 65, 81];
-            const pageWidth = doc.internal.pageSize.width; const pageHeight = doc.internal.pageSize.height;
+            // --- PROFESSIONAL INVOICE THEME (Orange & Dark Grey) ---
+            const orangeColor = [232, 92, 51]; // #E85C33
+            const darkGreyColor = [31, 41, 55]; // #1F2937
+            const lightGreyColor = [243, 244, 246]; // #F3F4F6
+            const pageWidth = doc.internal.pageSize.width; 
+            const pageHeight = doc.internal.pageSize.height;
 
-            doc.setFillColor(...brandColor); doc.rect(0, 0, pageWidth, 5, 'F'); 
-
-            let headerY = 20;
+            // --- 1. HEADER GRAPHICS ---
+            // Top left curve (Dark Grey)
+            doc.setFillColor(...darkGreyColor);
+            doc.ellipse(0, 0, 120, 60, 'F');
+            
+            // Top right curve (Orange)
+            doc.setFillColor(...orangeColor);
+            doc.ellipse(pageWidth, 0, 100, 80, 'F');
+            
+            // White curve to clean up top right overlap if needed, or just layer
+            
+            // --- 2. INSTITUTE INFO (Centered/Left) ---
+            let headerY = 40;
+            
+            // Logo if exists
             if (instituteDetails.logo_url) {
-                const img = await loadImage(instituteDetails.logo_url);
-                if (img) doc.addImage(img, 'PNG', 15, 15, 25, 25);
+                 const img = await loadImage(instituteDetails.logo_url);
+                 if (img) {
+                     doc.addImage(img, 'PNG', 15, 20, 20, 20);
+                 }
             }
 
-            doc.setFont("helvetica", "bold"); doc.setFontSize(22); doc.setTextColor(...brandColor);
-            doc.text(instituteDetails.name || "Institute Name", 45, 22);
-            doc.setFont("helvetica", "normal"); doc.setFontSize(9); doc.setTextColor(100, 100, 100);
-            const address = instituteDetails.address || "Address not updated";
-            const phone = instituteDetails.phone || userProfile.email || "Contact Admin";
-            doc.text(address, 45, 28); doc.text(`Contact: ${phone}`, 45, 33);
-            doc.setFont("helvetica", "bold"); doc.setFontSize(26); doc.setTextColor(220, 220, 220);
-            doc.text("RECEIPT", pageWidth - 15, 35, null, null, "right");
+            doc.setFont("helvetica", "bold"); 
+            doc.setFontSize(22); 
+            doc.setTextColor(...orangeColor);
+            doc.text(instituteDetails.name || "INSTITUTE NAME", 105, 35, null, null, "center");
 
-            doc.setDrawColor(200, 200, 200); doc.setFillColor(...accentColor);
-            doc.roundedRect(15, 50, 90, 40, 1, 1, 'F');
-            doc.setFontSize(8); doc.setTextColor(120, 120, 120); doc.text("BILLED TO", 20, 58);
-            doc.setFontSize(12); doc.setTextColor(...brandColor); doc.setFont("helvetica", "bold");
-            doc.text(currentStudentName, 20, 65); 
-            doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.setTextColor(...textColor);
-            doc.text(`Batch: ${batchName}`, 20, 72); 
+            doc.setFont("helvetica", "normal"); 
+            doc.setFontSize(10); 
+            doc.setTextColor(0, 0, 0);
+            const address = instituteDetails.address || "Address Line 1, City, State";
+            doc.text(address, 105, 42, null, null, "center");
+            
+            // --- 3. INVOICE META ---
+            doc.setFontSize(9);
+            doc.setTextColor(0, 0, 0);
+            
+            // Left side meta
+            const receiptId = payment.id === "New" ? "PENDING" : String(payment.id).substring(0,8).toUpperCase();
+            doc.text(`Receipt No: ${receiptId}`, 15, 70);
+            doc.text(`Date: ${new Date(payment.date_paid).toLocaleDateString('en-IN')}`, 15, 75);
+            
+            // Right side meta (Student)
+            doc.setFont("helvetica", "bold");
+            doc.setTextColor(...orangeColor);
+            doc.text("INVOICE TO", pageWidth - 15, 70, null, null, "right");
+            
+            doc.setTextColor(0, 0, 0);
+            doc.setFont("helvetica", "bold");
+            doc.text(currentStudentName, pageWidth - 15, 75, null, null, "right");
+            doc.setFont("helvetica", "normal");
+            doc.text(`Batch: ${batchName}`, pageWidth - 15, 80, null, null, "right");
+            if (currentStudentPhone) doc.text(`Phone: ${currentStudentPhone}`, pageWidth - 15, 85, null, null, "right");
 
-            const labelX = 130; const valueX = 195; const startMetaY = 58; const gap = 7;
-            doc.setFontSize(10);
-            doc.setTextColor(120, 120, 120); doc.text("Receipt No:", labelX, startMetaY);
-            doc.setTextColor(...textColor); doc.text(payment.id === "New" ? "PENDING" : payment.id.substring(0,8).toUpperCase(), valueX, startMetaY, null, null, "right");
-            doc.setTextColor(120, 120, 120); doc.text("Date:", labelX, startMetaY + gap);
-            doc.setTextColor(...textColor); doc.text(new Date(payment.date_paid).toLocaleDateString('en-IN'), valueX, startMetaY + gap, null, null, "right");
-            doc.setTextColor(120, 120, 120); doc.text("Payment Mode:", labelX, startMetaY + (gap*2));
-            doc.setTextColor(...textColor); doc.text(payment.payment_method || "Cash", valueX, startMetaY + (gap*2), null, null, "right");
-            doc.setTextColor(120, 120, 120); doc.text("Status:", labelX, startMetaY + (gap*3));
-            doc.setTextColor(34, 197, 94); doc.setFont("helvetica", "bold");
-            doc.text("PAID", valueX, startMetaY + (gap*3), null, null, "right");
+            // --- 4. TITLE ---
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(24);
+            doc.setTextColor(...orangeColor);
+            doc.text("FEE RECEIPT", 15, 100);
+            
+            // Orange vertical bar next to title
+            doc.setDrawColor(...orangeColor);
+            doc.setLineWidth(1.5);
+            doc.line(12, 92, 12, 102);
 
-            const tableData = [[{ content: description, styles: { fontStyle: 'bold' } }, formatter.format(payment.amount_paid)]];
-            if (payment.notes) tableData.push([{ content: `Note: ${payment.notes}`, styles: { fontSize: 8, textColor: [100,100,100] } }, ""]);
+
+            // --- 5. TABLE ---
+            const tableData = [[
+                "01", 
+                { content: description, styles: { fontStyle: 'bold' } }, 
+                formatter.format(payment.amount_paid)
+            ]];
+            
+            // Append notes if present
+            if (payment.notes) {
+                 tableData.push(["", { content: `Note: ${payment.notes}`, styles: { fontSize: 8, textColor: [100,100,100] } }, ""]);
+            }
 
             doc.autoTable({
-                startY: 100, head: [['DESCRIPTION', 'AMOUNT']], body: tableData, theme: 'plain',
-                headStyles: { fillColor: brandColor, textColor: [255,255,255], fontStyle: 'bold', cellPadding: 4 },
-                bodyStyles: { cellPadding: 5, fontSize: 10, textColor: textColor },
-                columnStyles: { 0: { cellWidth: 'auto' }, 1: { cellWidth: 40, halign: 'right' } },
-                didDrawPage: (d) => { doc.setDrawColor(200, 200, 200); doc.line(15, d.cursor.y, 195, d.cursor.y); }
+                startY: 110,
+                head: [['NO.', 'FEE DESCRIPTION', 'AMOUNT']],
+                body: tableData,
+                theme: 'plain',
+                headStyles: { 
+                    fillColor: orangeColor, 
+                    textColor: [255, 255, 255], 
+                    fontStyle: 'bold', 
+                    halign: 'center',
+                    cellPadding: 3
+                },
+                bodyStyles: { 
+                    cellPadding: 4, 
+                    fontSize: 10, 
+                    textColor: [0,0,0],
+                    lineColor: [200, 200, 200],
+                    lineWidth: { bottom: 0.1 }
+                },
+                columnStyles: { 
+                    0: { cellWidth: 15, halign: 'center' },
+                    1: { cellWidth: 'auto' }, 
+                    2: { cellWidth: 40, halign: 'right', fontStyle: 'bold' } 
+                },
             });
 
-            let finalY = doc.lastAutoTable.finalY + 5;
-            doc.setFontSize(9); doc.setTextColor(120, 120, 120); doc.text("Amount in words:", 15, finalY + 10);
-            doc.setFontSize(10); doc.setTextColor(...textColor); doc.setFont("helvetica", "italic");
-            doc.text(numToWords(parseInt(payment.amount_paid)), 15, finalY + 16);
+            // --- 6. FOOTER & TOTALS ---
+            let finalY = doc.lastAutoTable.finalY + 10;
+            
+            // Left Side: Payment Method & Terms
+            const leftX = 15;
+            doc.setFontSize(10);
+            doc.setFont("helvetica", "bold");
+            doc.setTextColor(...orangeColor);
+            doc.text("Payment Method:", leftX, finalY);
+            
+            doc.setFont("helvetica", "normal");
+            doc.setTextColor(0, 0, 0);
+            doc.text(`${payment.payment_method || "Cash"}`, leftX, finalY + 5);
+            
+            doc.setFont("helvetica", "bold");
+            doc.setTextColor(...orangeColor);
+            doc.text("Terms & Conditions:", leftX, finalY + 15);
+            
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(8);
+            doc.setTextColor(0, 0, 0);
+            const terms = [
+                "1. Fees once paid are not refundable.",
+                "2. This is a computer generated receipt."
+            ];
+            doc.text(terms, leftX, finalY + 20);
 
-            doc.setFont("helvetica", "bold"); doc.setFontSize(12); doc.setTextColor(...brandColor);
-            doc.text("Total Paid:", 150, finalY + 10); doc.text(formatter.format(payment.amount_paid), 195, finalY + 10, null, null, "right");
-            doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.setTextColor(220, 38, 38); 
-            doc.text("Balance Remaining:", 150, finalY + 18); doc.text(balanceText, 195, finalY + 18, null, null, "right");
+            // Right Side: Totals Box
+            const rightX = 120;
+            const rightWidth = 75;
+            
+            // Subtotal Line
+            doc.setFontSize(10);
+            doc.text("Subtotal:", 150, finalY, null, null, "right");
+            doc.text(formatter.format(payment.amount_paid), 195, finalY, null, null, "right");
+            
+            // Divider
+            doc.setDrawColor(0, 0, 0);
+            doc.line(120, finalY + 3, 195, finalY + 3);
+            
+            // Total Block (Orange Background)
+            const totalBoxY = finalY + 10;
+            doc.setFillColor(...orangeColor);
+            doc.rect(120, totalBoxY, 75, 10, 'F');
+            
+            doc.setTextColor(255, 255, 255);
+            doc.setFont("helvetica", "bold");
+            doc.text("TOTAL:", 125, totalBoxY + 7);
+            doc.text(formatter.format(payment.amount_paid), 190, totalBoxY + 7, null, null, "right");
+            
+            // Amount in Words
+            doc.setTextColor(0,0,0);
+            doc.setFont("helvetica", "italic");
+            doc.setFontSize(9);
+            doc.text(`Amount in words: ${numToWords(parseInt(payment.amount_paid))}`, 15, finalY + 35);
 
-            const footerY = 240;
-            doc.setDrawColor(100, 100, 100); doc.line(140, footerY, 190, footerY);
-            doc.setFontSize(8); doc.setTextColor(100, 100, 100); doc.text("Authorized Signatory", 165, footerY + 5, null, null, "center");
-            doc.setFontSize(7); doc.setTextColor(150, 150, 150);
-            const terms = ["TERMS & CONDITIONS:", "1. Fees once paid are not refundable or transferable.", "2. Late fee charges may apply.", "3. This is a computer generated receipt."];
-            doc.text(terms, 15, footerY);
-            doc.text(`Generated on: ${new Date().toLocaleString()}`, 195, pageHeight - 10, null, null, "right");
-            doc.setFillColor(...brandColor); doc.rect(0, pageHeight - 3, pageWidth, 3, 'F');
+            // Bottom Curves
+            doc.setFillColor(...orangeColor);
+            doc.ellipse(30, pageHeight, 100, 40, 'F');
+            doc.setFillColor(...darkGreyColor);
+            doc.ellipse(pageWidth - 30, pageHeight, 120, 50, 'F');
 
+            // Save logic
             if (returnBlob) {
                 return doc.output('blob');
             } else {
