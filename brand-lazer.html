@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vaayura Collection - House of Charming</title>
+    <title>Laeer Collection - House of Charming</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -43,7 +43,7 @@
           style="max-width: 110%; max-height: 110%; object-fit: contain"
         />
       </div>
-      <h1>Vaayura</h1>
+      <h1>Laeer</h1>
       <p>
         Luxury ventilation solutions where tradition meets modern engineering.
       </p>
@@ -155,6 +155,17 @@
       </div>
     </section>
 
+    <div id="pdfModal" class="pdf-modal">
+      <div class="pdf-modal-content">
+        <span class="close-pdf" onclick="closePdfModal()">&times;</span>
+        <h3>Laeer Catalog Preview</h3>
+        <iframe
+          src="pdf/Lazer air circulator fan catalouge.pdf"
+          class="pdf-frame"
+        ></iframe>
+      </div>
+    </div>
+
     <section class="pdf-gallery-section">
       <div class="section-header">
         <h3>Product Catalogs</h3>
@@ -164,115 +175,22 @@
       <div class="pdf-list">
         <div class="pdf-item">
           <div class="pdf-toolbar">
-            <h4>Lazer Air Circulator Fan</h4>
+            <h4>Laeer Air Purifiers (Corporate)</h4>
             <a
               href="pdf/Lazer air circulator fan catalouge.pdf"
               download
               class="pdf-download-btn"
-              >Download ↓</a
             >
+              Download ↓
+            </a>
           </div>
           <iframe
-            src="pdf/Lazer air circulator fan catalouge.pdf"
+            src="https://docs.google.com/viewer?url=https://houseofcharming.com/pdf/Lazer air circulator fan catalouge.pdf&embedded=true"
             class="pdf-frame-embedded"
             loading="lazy"
-          ></iframe>
-        </div>
-
-        <div class="pdf-item">
-          <div class="pdf-toolbar">
-            <h4>Lazer Appliances</h4>
-            <a
-              href="pdf/Lazer APPLIANCES CATALOUGE.pdf"
-              download
-              class="pdf-download-btn"
-              >Download ↓</a
-            >
-          </div>
-          <iframe
-            src="pdf/Lazer APPLIANCES CATALOUGE.pdf"
-            class="pdf-frame-embedded"
-            loading="lazy"
-          ></iframe>
-        </div>
-
-        <div class="pdf-item">
-          <div class="pdf-toolbar">
-            <h4>Lazer Chimney (June 24)</h4>
-            <a
-              href="pdf/Lazer chimney final 24 june.pdf"
-              download
-              class="pdf-download-btn"
-              >Download ↓</a
-            >
-          </div>
-          <iframe
-            src="pdf/Lazer chimney final 24 june.pdf"
-            class="pdf-frame-embedded"
-            loading="lazy"
-          ></iframe>
-        </div>
-
-        <div class="pdf-item">
-          <div class="pdf-toolbar">
-            <h4>Lazer Cooler</h4>
-            <a href="pdf/Lazer COOLER.pdf" download class="pdf-download-btn"
-              >Download ↓</a
-            >
-          </div>
-          <iframe
-            src="pdf/Lazer COOLER.pdf"
-            class="pdf-frame-embedded"
-            loading="lazy"
-          ></iframe>
-        </div>
-
-        <div class="pdf-item">
-          <div class="pdf-toolbar">
-            <h4>Lazer Fan Catalog 2025</h4>
-            <a
-              href="pdf/Lazer FAN CATALOUGE FINAL CARTON 2025.pdf fan catalouge.pdf"
-              download
-              class="pdf-download-btn"
-              >Download ↓</a
-            >
-          </div>
-          <iframe
-            src="pdf/Lazer FAN CATALOUGE FINAL CARTON 2025.pdf fan catalouge.pdf"
-            class="pdf-frame-embedded"
-            loading="lazy"
-          ></iframe>
-        </div>
-
-        <div class="pdf-item">
-          <div class="pdf-toolbar">
-            <h4>Lazer Iron</h4>
-            <a href="pdf/Lazer iron.pdf" download class="pdf-download-btn"
-              >Download ↓</a
-            >
-          </div>
-          <iframe
-            src="pdf/Lazer iron.pdf"
-            class="pdf-frame-embedded"
-            loading="lazy"
-          ></iframe>
-        </div>
-
-        <div class="pdf-item">
-          <div class="pdf-toolbar">
-            <h4>Lazer Water Heater 2025</h4>
-            <a
-              href="pdf/Lazer water heater catalouge final 2025.pdf"
-              download
-              class="pdf-download-btn"
-              >Download ↓</a
-            >
-          </div>
-          <iframe
-            src="pdf/Lazer water heater catalouge final 2025.pdf"
-            class="pdf-frame-embedded"
-            loading="lazy"
-          ></iframe>
+            style="border: none"
+          >
+          </iframe>
         </div>
       </div>
     </section>
@@ -280,7 +198,7 @@
     <section class="brand-story">
       <h2>About The Collection</h2>
       <p>
-        Vaayura represents the pinnacle of premium fan design. Every piece is
+        Laeer represents the pinnacle of premium fan design. Every piece is
         crafted not just to cool a room, but to elevate its aesthetic. From
         hand-polished brass finishes to aerodynamically perfected wooden blades,
         this collection is designed for the discerning homeowner who refuses to
@@ -291,7 +209,25 @@
     <app-footer></app-footer>
 
     <script>
-      // 1. Manual Scroll Logic
+      // 1. PDF Modal Logic
+      function openPdfModal() {
+        document.getElementById("pdfModal").style.display = "flex";
+        document.body.style.overflow = "hidden";
+      }
+
+      function closePdfModal() {
+        document.getElementById("pdfModal").style.display = "none";
+        document.body.style.overflow = "auto";
+      }
+
+      window.onclick = function (event) {
+        var modal = document.getElementById("pdfModal");
+        if (event.target == modal) {
+          closePdfModal();
+        }
+      };
+
+      // 2. Manual Scroll Logic
       function scrollBrandProducts(direction) {
         const container = document.getElementById("brandProductContainer");
         const scrollAmount = 350;
@@ -302,26 +238,6 @@
           container.scrollLeft += scrollAmount;
         }
       }
-
-      // 2. Auto Scroll Logic
-      setInterval(() => {
-        const container = document.getElementById("brandProductContainer");
-
-        if (container) {
-          const scrollAmount = 350;
-          // Check if we reached the end of the slider
-          if (
-            container.scrollLeft + container.clientWidth >=
-            container.scrollWidth - 10
-          ) {
-            // If at end, loop back to start
-            container.scrollTo({ left: 0, behavior: "smooth" });
-          } else {
-            // Otherwise, scroll right
-            container.scrollBy({ left: scrollAmount, behavior: "smooth" });
-          }
-        }
-      }, 2500);
 
       // 3. NEW: Auto Scroll Logic
       setInterval(() => {
