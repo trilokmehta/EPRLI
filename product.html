@@ -1,0 +1,419 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>The Royal Wind - House of Charming</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800&family=Lora:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+
+    <style>
+      /* --- PRODUCT DETAIL SPECIFIC STYLES --- */
+
+      .product-detail-container {
+        max-width: 1200px;
+        margin: 40px auto;
+        padding: 0 24px;
+        display: grid;
+        grid-template-columns: 1.2fr 1fr; /* Image takes slightly more space */
+        gap: 60px;
+        align-items: start;
+      }
+
+      /* Left Column: Images */
+      .product-gallery {
+        position: sticky;
+        top: 100px; /* Sticks as you scroll */
+      }
+
+      .main-image-box {
+        width: 100%;
+        height: 500px;
+        border-radius: 20px;
+        overflow: hidden;
+        border: 1px solid #eee;
+        margin-bottom: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+      }
+
+      .main-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+      }
+
+      .main-image-box:hover .main-img {
+        transform: scale(1.1); /* Zoom effect */
+      }
+
+      .thumbnail-grid {
+        display: flex;
+        gap: 16px;
+      }
+
+      .thumb {
+        width: 100px;
+        height: 100px;
+        border-radius: 12px;
+        cursor: pointer;
+        opacity: 0.6;
+        border: 2px solid transparent;
+        transition: all 0.3s;
+        object-fit: cover;
+      }
+
+      .thumb:hover,
+      .thumb.active {
+        opacity: 1;
+        border-color: var(--gold);
+      }
+
+      /* Right Column: Info */
+      .product-details {
+        padding-top: 20px;
+      }
+
+      .detail-brand {
+        color: var(--gold);
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        font-size: 14px;
+        margin-bottom: 12px;
+        display: block;
+      }
+
+      .detail-title {
+        font-family: "Playfair Display", serif;
+        font-size: 48px;
+        color: var(--black);
+        margin-bottom: 16px;
+        line-height: 1.1;
+      }
+
+      .detail-price {
+        font-size: 28px;
+        color: var(--dark-gold);
+        font-weight: 600;
+        margin-bottom: 32px;
+        display: block;
+        font-family: "Playfair Display", serif;
+      }
+
+      .detail-desc {
+        font-size: 18px;
+        color: var(--medium-gray);
+        margin-bottom: 40px;
+        line-height: 1.8;
+      }
+
+      /* Specs Table */
+      .specs-list {
+        list-style: none;
+        margin-bottom: 40px;
+        border-top: 1px solid #eee;
+      }
+
+      .specs-list li {
+        display: flex;
+        justify-content: space-between;
+        padding: 16px 0;
+        border-bottom: 1px solid #eee;
+        font-size: 16px;
+      }
+
+      .spec-label {
+        font-weight: 600;
+        color: var(--black);
+      }
+
+      /* Buttons */
+      .action-buttons {
+        display: flex;
+        gap: 20px;
+        margin-top: 40px;
+      }
+
+      .btn-enquire {
+        flex: 1;
+        padding: 18px;
+        background: var(--black);
+        color: var(--white);
+        text-align: center;
+        border-radius: 50px;
+        font-family: "Playfair Display", serif;
+        font-weight: 700;
+        text-transform: uppercase;
+        text-decoration: none;
+        transition: all 0.3s ease;
+      }
+
+      .btn-enquire:hover {
+        background: var(--gold);
+        color: var(--black);
+      }
+
+      .btn-whatsapp {
+        padding: 18px 24px;
+        border: 2px solid #25d366;
+        color: #25d366;
+        border-radius: 50px;
+        font-size: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        transition: all 0.3s ease;
+      }
+
+      .btn-whatsapp:hover {
+        background: #25d366;
+        color: white;
+      }
+
+      /* Responsive */
+      @media (max-width: 900px) {
+        .product-detail-container {
+          grid-template-columns: 1fr;
+          gap: 40px;
+        }
+        .product-gallery {
+          position: static;
+        }
+        .main-image-box {
+          height: 350px;
+        }
+        .detail-title {
+          font-size: 36px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <app-header></app-header>
+
+    <div
+      style="
+        max-width: 1200px;
+        margin: 20px auto;
+        padding: 0 24px;
+        font-size: 14px;
+      "
+    >
+      <a href="main.html" style="color: #999; text-decoration: none">Home</a>
+      <span style="margin: 0 8px; color: #ccc">/</span>
+      <a href="product_page.html" style="color: #999; text-decoration: none"
+        >Fans</a
+      >
+      <span style="margin: 0 8px; color: #ccc">/</span>
+      <span style="color: var(--gold)">The Royal Wind</span>
+    </div>
+
+    <div class="product-detail-container">
+      <div class="product-gallery">
+        <div class="main-image-box">
+          <img
+            id="mainImg"
+            src="https://images.unsplash.com/photo-1618219944342-824e40f13285?auto=format&fit=crop&w=1200&q=80"
+            class="main-img"
+            alt="Royal Wind Fan"
+          />
+        </div>
+        <div class="thumbnail-grid">
+          <img
+            src="https://images.unsplash.com/photo-1618219944342-824e40f13285?auto=format&fit=crop&w=200&q=80"
+            class="thumb active"
+            onclick="changeImage(this.src)"
+          />
+          <img
+            src="https://images.unsplash.com/photo-1513506003013-d8c98186260a?auto=format&fit=crop&w=200&q=80"
+            class="thumb"
+            onclick="changeImage(this.src)"
+          />
+          <img
+            src="https://images.unsplash.com/photo-1540932296774-3ed692575255?auto=format&fit=crop&w=200&q=80"
+            class="thumb"
+            onclick="changeImage(this.src)"
+          />
+        </div>
+      </div>
+
+      <div class="product-details">
+        <span class="detail-brand">Vaayura Collection</span>
+        <h1 class="detail-title">The Royal Wind</h1>
+        <span class="detail-price">₹12,500</span>
+
+        <p class="detail-desc">
+          Experience the epitome of luxury ventilation. The Royal Wind is
+          handcrafted from premium brass and finished with hand-polished wooden
+          blades. Designed for silent operation, it brings a breeze of elegance
+          to any heritage or modern living space.
+        </p>
+
+        <ul class="specs-list">
+          <li>
+            <span class="spec-label">Material</span>
+            <span>Solid Brass & Teak Wood</span>
+          </li>
+          <li>
+            <span class="spec-label">Blade Span</span>
+            <span>1200 mm (48 inch)</span>
+          </li>
+          <li>
+            <span class="spec-label">Motor</span>
+            <span>High-Torque Silent Copper Motor</span>
+          </li>
+          <li>
+            <span class="spec-label">Finish</span>
+            <span>Antique Gold</span>
+          </li>
+          <li>
+            <span class="spec-label">Warranty</span>
+            <span>5 Years</span>
+          </li>
+        </ul>
+
+        <div class="action-buttons">
+          <a href="#" class="btn-enquire">Enquire Now</a>
+          <a
+            href="https://wa.me/1234567890?text=I'm interested in The Royal Wind Fan"
+            class="btn-whatsapp"
+            target="_blank"
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"
+              />
+            </svg>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <section
+      class="collection-section"
+      style="background: var(--light-gray); padding: 80px 0"
+    >
+      <div class="section-header">
+        <h3 class="section-title">You May Also Like</h3>
+      </div>
+
+      <div class="product-slider-wrapper">
+        <div class="products-grid">
+          <div class="product-card">
+            <img
+              src="https://images.unsplash.com/photo-1513506003013-d8c98186260a?auto=format&fit=crop&w=800&q=80"
+              class="card-img"
+            />
+            <div class="card-info">
+              <h4 class="card-title">Vintage Oscillator</h4>
+              <p class="card-meta">₹8,900</p>
+            </div>
+          </div>
+          <div class="product-card">
+            <img
+              src="https://images.unsplash.com/photo-1540932296774-3ed692575255?auto=format&fit=crop&w=800&q=80"
+              class="card-img"
+            />
+            <div class="card-info">
+              <h4 class="card-title">Aero Silent</h4>
+              <p class="card-meta">₹15,000</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="team-connect-section">
+      <div class="team-grid">
+        <div class="team-card photo-card">
+          <img
+            src="https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=600&q=80"
+            alt="Client Representative"
+            class="team-photo"
+          />
+          <a
+            href="tel:+1234567890"
+            class="btn btn-primary"
+            style="
+              border-radius: 50px;
+              padding: 12px 32px;
+              width: 80%;
+              text-align: center;
+            "
+          >
+            Call Now
+          </a>
+        </div>
+
+        <div class="team-card info-card">
+          <h3 class="team-title">Connect With Our Team</h3>
+          <div class="team-details">
+            <div class="detail-row">
+              <span class="label">Name:</span>
+              <span class="value">Mr. Charming</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">Number:</span>
+              <span class="value">+91 98765 43210</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">City:</span>
+              <span class="value">Mumbai</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="pill-container">
+      <div class="pill-title">Our Partners</div>
+    </div>
+
+    <section class="category-brands-section">
+      <div class="category-brands-grid">
+        <a href="brand-vaayura.html" class="brand-circle-link">
+          <img src="images/vaayura.png" alt="Vaayura" />
+        </a>
+
+        <a href="#" class="brand-circle-link">
+          <img src="images/the fan studio.avif" alt="The Fan Studio" />
+        </a>
+
+        <a href="#" class="brand-circle-link">
+          <img src="images/amase.png" alt="Amase" />
+        </a>
+
+        <a href="#" class="brand-circle-link">
+          <span
+            style="
+              font-family: &quot;Playfair Display&quot;;
+              font-weight: 700;
+              color: var(--gold);
+              font-size: 24px;
+            "
+            >HOC</span
+          >
+        </a>
+      </div>
+    </section>
+
+    <app-footer></app-footer>
+
+    <script>
+      function changeImage(src) {
+        document.getElementById("mainImg").src = src;
+        // Optional: Update active class styling logic here if desired
+      }
+    </script>
+    <script src="header.js" defer></script>
+    <script src="footer.js" defer></script>
+  </body>
+</html>

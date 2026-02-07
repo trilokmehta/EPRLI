@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vaayura Collection - House of Charming</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800&family=Lora:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      /* This is a default background, specific pages override it inline if needed */
+      .brand-hero {
+        /* Keep your existing layout properties (flex, height, etc.) */
+
+        /* Update the background image here */
+        background-image:
+          linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.8)),
+          /* Dark overlay */
+          url("https://images.unsplash.com/photo-1616046229478-9901c5536a45?q=80&w=580&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"); /* <-- PUT YOUR IMAGE PATH HERE */
+
+        /* Keeps the image fixed while scrolling (Parallax effect) */
+        background-attachment: fixed;
+        background-size: cover;
+        background-position: center;
+
+        /* Royal Border at bottom */
+        border-bottom: 4px solid var(--gold);
+      }
+    </style>
+  </head>
+  <body>
+    <app-header></app-header>
+
+    <section class="brand-hero">
+      <div class="brand-logo-large">
+        <img
+          src="images/esson.png"
+          style="max-width: 110%; max-height: 110%; object-fit: contain"
+        />
+      </div>
+      <h1>Vaayura</h1>
+      <p>
+        Luxury ventilation solutions where tradition meets modern engineering.
+      </p>
+    </section>
+
+    <section class="collection-section">
+      <div class="section-header">
+        <h3>Signature Products</h3>
+      </div>
+
+      <div class="product-slider-wrapper">
+        <button class="scroll-btn left" onclick="scrollBrandProducts('left')">
+          ❮
+        </button>
+
+        <div class="products-grid" id="brandProductContainer">
+          <div class="product-card">
+            <img
+              src="https://images.unsplash.com/photo-1615397349754-cfa2066a298e?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+              class="card-img"
+            />
+            <div class="card-info">
+              <h4 class="card-title">The Royal Wind</h4>
+              <p class="card-meta">Ceiling Fan</p>
+            </div>
+          </div>
+
+          <div class="product-card">
+            <img
+              src="https://images.unsplash.com/photo-1606744824163-985d376605aa?q=80&w=1632&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+              class="card-img"
+            />
+            <div class="card-info">
+              <h4 class="card-title">Vintage Oscillator</h4>
+              <p class="card-meta">Wall Mount</p>
+            </div>
+          </div>
+
+          <div class="product-card">
+            <img
+              src="https://images.unsplash.com/photo-1540932296774-3ed692575255?auto=format&fit=crop&w=800&q=80"
+              class="card-img"
+            />
+            <div class="card-info">
+              <h4 class="card-title">Aero Silent</h4>
+              <p class="card-meta">Smart Fan</p>
+            </div>
+          </div>
+
+          <div class="product-card">
+            <img
+              src="https://images.unsplash.com/photo-1615397349754-cfa2066a298e?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+              class="card-img"
+            />
+            <div class="card-info">
+              <h4 class="card-title">Royal Wind II</h4>
+              <p class="card-meta">Gold Edition</p>
+            </div>
+          </div>
+
+          <div class="product-card">
+            <img
+              src="https://images.unsplash.com/photo-1615397349754-cfa2066a298e?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+              class="card-img"
+            />
+            <div class="card-info">
+              <h4 class="card-title">The Royal Wind</h4>
+              <p class="card-meta">Ceiling Fan</p>
+            </div>
+          </div>
+
+          <div class="product-card">
+            <img
+              src="https://images.unsplash.com/photo-1618219944342-824e40f13285?auto=format&fit=crop&w=800&q=80"
+              class="card-img"
+            />
+            <div class="card-info">
+              <h4 class="card-title">Vintage Oscillator</h4>
+              <p class="card-meta">Wall Mount</p>
+            </div>
+          </div>
+
+          <div class="product-card">
+            <img
+              src="https://images.unsplash.com/photo-1540932296774-3ed692575255?auto=format&fit=crop&w=800&q=80"
+              class="card-img"
+            />
+            <div class="card-info">
+              <h4 class="card-title">Aero Silent</h4>
+              <p class="card-meta">Smart Fan</p>
+            </div>
+          </div>
+
+          <div class="product-card">
+            <img
+              src="https://images.unsplash.com/photo-1615397349754-cfa2066a298e?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+              class="card-img"
+            />
+            <div class="card-info">
+              <h4 class="card-title">Royal Wind II</h4>
+              <p class="card-meta">Gold Edition</p>
+            </div>
+          </div>
+        </div>
+
+        <button class="scroll-btn right" onclick="scrollBrandProducts('right')">
+          ❯
+        </button>
+      </div>
+    </section>
+
+    <section class="pdf-gallery-section">
+      <div class="section-header">
+        <h3>Product Catalogs</h3>
+        <p>View our complete technical specifications and brochures below.</p>
+      </div>
+
+      <div class="pdf-list">
+        <div class="pdf-item">
+          <div class="pdf-toolbar">
+            <h4>Vaayura Air Purifiers (Corporate)</h4>
+            <a href="pdf/Esson PDF 2025.pdf" download class="pdf-download-btn">
+              Download ↓
+            </a>
+          </div>
+          <iframe
+            src="pdf/Esson PDF 2025.pdf"
+            class="pdf-frame-embedded"
+            loading="lazy"
+          >
+          </iframe>
+        </div>
+      </div>
+    </section>
+
+    <section class="brand-story">
+      <h2>About The Collection</h2>
+      <p>
+        Vaayura represents the pinnacle of premium fan design. Every piece is
+        crafted not just to cool a room, but to elevate its aesthetic. From
+        hand-polished brass finishes to aerodynamically perfected wooden blades,
+        this collection is designed for the discerning homeowner who refuses to
+        compromise on style.
+      </p>
+    </section>
+
+    <app-footer></app-footer>
+
+    <div id="pdfModal" class="pdf-modal">
+      <div class="pdf-modal-content">
+        <span class="close-pdf" onclick="closePdfModal()">&times;</span>
+        <h3>Vaayura Catalog Preview</h3>
+        <iframe
+          src="pdf/Vaayura Air Purifiers (Corp Catalogue).pdf"
+          class="pdf-frame"
+        ></iframe>
+      </div>
+    </div>
+
+    <script>
+      // 1. PDF Modal Logic
+      function openPdfModal() {
+        document.getElementById("pdfModal").style.display = "flex";
+        document.body.style.overflow = "hidden";
+      }
+
+      function closePdfModal() {
+        document.getElementById("pdfModal").style.display = "none";
+        document.body.style.overflow = "auto";
+      }
+
+      window.onclick = function (event) {
+        var modal = document.getElementById("pdfModal");
+        if (event.target == modal) {
+          closePdfModal();
+        }
+      };
+
+      // 2. Manual Scroll Logic
+      function scrollBrandProducts(direction) {
+        const container = document.getElementById("brandProductContainer");
+        const scrollAmount = 350;
+
+        if (direction === "left") {
+          container.scrollLeft -= scrollAmount;
+        } else {
+          container.scrollLeft += scrollAmount;
+        }
+      }
+
+      // 3. NEW: Auto Scroll Logic
+      setInterval(() => {
+        const container = document.getElementById("brandProductContainer");
+
+        if (container) {
+          const scrollAmount = 350; // Card width + gap
+
+          // Check if we reached the end of the slider
+          if (
+            container.scrollLeft + container.clientWidth >=
+            container.scrollWidth - 10
+          ) {
+            // If at end, loop back to start
+            container.scrollTo({ left: 0, behavior: "smooth" });
+          } else {
+            // Otherwise, scroll right
+            container.scrollBy({ left: scrollAmount, behavior: "smooth" });
+          }
+        }
+      }, 2500); // Speed: 2.5 seconds
+    </script>
+
+    <script src="header.js" defer></script>
+    <script src="footer.js" defer></script>
+
+    <a href="https://wa.me/1234567890" class="whatsapp-btn" target="_blank">
+      <svg
+        width="35"
+        height="35"
+        viewBox="0 0 24 24"
+        fill="white"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"
+        />
+      </svg>
+    </a>
+  </body>
+</html>
