@@ -568,21 +568,28 @@ section {
 
 .brands-slider {
   width: 100%;
-  overflow-x: auto;
-  overflow-y: hidden;
+  overflow-x: auto; /* ALLOWS scrolling now */
+  scroll-behavior: smooth;
   white-space: nowrap;
-  position: relative;
+  /* Hide scrollbar */
+  -ms-overflow-style: none;
   scrollbar-width: none;
 }
-
+/* Stops the loop when user hovers over the track */
+.brands-track:hover {
+  animation-play-state: paused;
+}
 .brands-slider::-webkit-scrollbar {
   display: none;
 }
 
 .brands-track {
   display: inline-flex;
-  gap: 100px;
-  animation: scrollLoop 30s linear infinite;
+  gap: 40px; /* Adjust gap as needed */
+  
+  /* CRITICAL: Turn off the auto-moving animation */
+  animation: scrollLoop 250s linear infinite;
+  
 }
 
 @keyframes scrollLoop {
@@ -596,19 +603,16 @@ section {
 
 .brand-btn {
   display: flex;
-  align-items: center;
   justify-content: center;
-  width: 150px;
-  height: 150px;
-  border: 1px solid transparent;
-  background: rgba(255, 255, 255, 0.95);
-  transition: all 0.4s ease;
-  border-radius: 50%;
-  overflow: hidden;
-  -webkit-mask-image: -webkit-radial-gradient(white, black);
-  mask-image: radial-gradient(white, black);
-  transform: translateZ(0);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  align-items: center;
+  flex: 0 0 auto; /* This prevents the circles from squishing in the scrolling row */
+  width: 140px; /* Adjust this value to make the circles larger or smaller */
+  aspect-ratio: 1 / 1; /* Forces a perfect square */
+  border-radius: 50%; /* Turns it into a perfect circle */
+  background-color: #ffffff; /* Solid pure white */
+  padding: 20px; /* Gives the inner logo breathing room so it doesn't touch the edges */
+  box-sizing: border-box;
+  text-decoration: none;
 }
 
 .brand-btn:hover {
@@ -619,8 +623,8 @@ section {
 }
 
 .brand-img {
-  max-width: 70%;
-  max-height: 70%;
+  max-width: 100%;
+  max-height: 100%;
   object-fit: contain;
   filter: grayscale(100%);
   opacity: 0.8;
@@ -1789,9 +1793,21 @@ footer {
   }
 }
 
+/* On mobile phones... */
 @media (max-width: 768px) {
+  /* Hide the PDF viewer iframe */
   .pdf-frame-embedded {
-    display: block !important; /* Force it to show */
-    height: 500px; /* Give it enough height to be readable */
+    display: none !important;
+  }
+
+  /* Make the download button look like a big "View PDF" button */
+  .pdf-download-btn {
+    display: block;
+    width: 100%;
+    text-align: center;
+    padding: 12px;
+    background-color: #b8860b;
+    color: white !important;
+    margin-top: 10px;
   }
 }

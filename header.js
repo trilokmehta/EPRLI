@@ -4,7 +4,7 @@ class AppHeader extends HTMLElement {
     this.innerHTML = `
   <header>
     <div class="header-content">
-      <a href="main.html" class="logo-section">
+      <a href="index.html" class="logo-section">
         <div class="logo-circle"><span class="logo-icon">HOC</span></div>
       </a>
 
@@ -18,10 +18,10 @@ class AppHeader extends HTMLElement {
 
       <div class="header-actions">
         <a href="tel:+1234567890" class="btn">Call Now</a>
-        <a href="main.html#products" class="btn btn-primary">Catalogue</a>
+        <a href="Catalogue.html" class="btn btn-primary">Catalogue</a>
       </div>
       
-      <a href="main.html#products" class="mobile-catalog-btn">Catalogue</a>
+      <a href="Catalogue.html" class="mobile-catalog-btn">Catalogue</a>
       <button class="mobile-menu-btn" id="menuBtn">☰</button>
     </div>
   </header>

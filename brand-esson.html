@@ -31,6 +31,26 @@
         /* Royal Border at bottom */
         border-bottom: 4px solid var(--gold);
       }
+
+      .brand-logo-large {
+        width: 100%;
+        max-width: 160px; /* Adjust this value to make the circle bigger or smaller */
+        aspect-ratio: 1 / 1; /* Forces a perfect square on all devices */
+        border-radius: 50%; /* Turns the square into a perfect circle */
+        background-color: #ffffff; /* Solid white background */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 0 auto 20px auto; /* Centers the circle horizontally */
+        padding: 20px; /* Adds breathing room so the logo doesn't touch the circle edges */
+        box-sizing: border-box;
+      }
+
+      .brand-logo-large img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain; /* Ensures the inner logo never stretches or squishes */
+      }
     </style>
   </head>
   <body>
@@ -38,10 +58,7 @@
 
     <section class="brand-hero">
       <div class="brand-logo-large">
-        <img
-          src="images/esson.png"
-          style="max-width: 110%; max-height: 110%; object-fit: contain"
-        />
+        <img src="images/esson.png" />
       </div>
       <h1>Esson</h1>
       <p>
@@ -62,18 +79,7 @@
         <div class="products-grid" id="brandProductContainer">
           <div class="product-card">
             <img
-              src="https://images.unsplash.com/photo-1615397349754-cfa2066a298e?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-              class="card-img"
-            />
-            <div class="card-info">
-              <h4 class="card-title">The Royal Wind</h4>
-              <p class="card-meta">Ceiling Fan</p>
-            </div>
-          </div>
-
-          <div class="product-card">
-            <img
-              src="https://images.unsplash.com/photo-1606744824163-985d376605aa?q=80&w=1632&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+              src="products/Air cooler/41C8gTCm14L._SY300_SX300_QL70_FMwebp_.webp"
               class="card-img"
             />
             <div class="card-info">
@@ -84,7 +90,7 @@
 
           <div class="product-card">
             <img
-              src="https://images.unsplash.com/photo-1540932296774-3ed692575255?auto=format&fit=crop&w=800&q=80"
+              src="products/Air cooler/51c+0SONouL._SX522_.jpg"
               class="card-img"
             />
             <div class="card-info">
@@ -95,7 +101,7 @@
 
           <div class="product-card">
             <img
-              src="https://images.unsplash.com/photo-1615397349754-cfa2066a298e?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+              src="products/Air cooler/51KjDdeAUEL._SX522_.jpg"
               class="card-img"
             />
             <div class="card-info">
@@ -106,7 +112,7 @@
 
           <div class="product-card">
             <img
-              src="https://images.unsplash.com/photo-1615397349754-cfa2066a298e?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+              src="products/Air cooler/61jtLRl-ywL._SX522_.jpg"
               class="card-img"
             />
             <div class="card-info">
@@ -117,7 +123,7 @@
 
           <div class="product-card">
             <img
-              src="https://images.unsplash.com/photo-1618219944342-824e40f13285?auto=format&fit=crop&w=800&q=80"
+              src="products/Air cooler/61jtLRl-ywL._SX522_.jpg"
               class="card-img"
             />
             <div class="card-info">
@@ -128,7 +134,7 @@
 
           <div class="product-card">
             <img
-              src="https://images.unsplash.com/photo-1540932296774-3ed692575255?auto=format&fit=crop&w=800&q=80"
+              src="products/Air cooler/61U0x1kk7eL._SX522_.jpg"
               class="card-img"
             />
             <div class="card-info">
@@ -139,7 +145,7 @@
 
           <div class="product-card">
             <img
-              src="https://images.unsplash.com/photo-1615397349754-cfa2066a298e?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+              src="products/Air cooler/71eEguBzL8L._SX522_.jpg"
               class="card-img"
             />
             <div class="card-info">
@@ -173,16 +179,17 @@
         <div class="pdf-item">
           <div class="pdf-toolbar">
             <h4>Esson Air Purifiers (Corporate)</h4>
-            <a href="pdf/Esson PDF 2025.pdf" download class="pdf-download-btn">
+            <a href="New folder/Esson PDF 2025.pdf" download class="pdf-download-btn">
               Download ↓
             </a>
           </div>
           <iframe
-            src="https://docs.google.com/viewer?url=https://houseofcharming.com/pdf/Esson PDF 2025.pdf&embedded=true"
+            src="New folder/Esson%20PDF%202025.pdf"
             class="pdf-frame-embedded"
             loading="lazy"
-            style="border: none"
+            style="border: none; width: 100%; height: 600px;"
           >
+            <p>Your browser does not support PDFs. <a href="pdf/Esson%20PDF%202025.pdf">Download the PDF</a>.</p>
           </iframe>
         </div>
       </div>
