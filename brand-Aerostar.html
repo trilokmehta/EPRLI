@@ -51,6 +51,57 @@
         height: 100%;
         object-fit: contain; /* Ensures the inner logo never stretches or squishes */
       }
+
+      /* PDF Grid Layout */
+      .fw-pdf-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 25px;
+        width: 100%;
+      }
+
+      /* PDF Card Styling */
+      .fw-pdf-card {
+        background: #ffffff;
+        border: 1px solid #eaeaea;
+        border-radius: 8px;
+        padding: 40px 20px;
+        text-align: center;
+        text-decoration: none;
+        color: #111;
+        transition: all 0.4s ease;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .fw-pdf-card:hover {
+        border-color: #d4af37;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+        transform: translateY(-8px);
+      }
+
+      /* Typography and Icons */
+      .pdf-icon {
+        font-size: 3.5rem;
+        margin-bottom: 20px;
+      }
+
+      .fw-pdf-card h3 {
+        font-family: "Playfair Display", serif;
+        font-size: 1.3rem;
+        margin: 0 0 10px 0;
+      }
+
+      .fw-pdf-card p {
+        font-family: "Lora", serif;
+        color: #d4af37;
+        font-weight: 500;
+        margin: 0;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 1px;
+      }
     </style>
   </head>
   <body>
@@ -156,9 +207,38 @@
       <div class="pdf-modal-content">
         <span class="close-pdf" onclick="closePdfModal()">&times;</span>
         <h3>Aerostar Catalog Preview</h3>
-        <iframe src="pdf/Aerostar PDF 2025.pdf" class="pdf-frame"></iframe>
+        <iframe
+          src="New folder/Aerostar PDF 2025.pdf"
+          class="pdf-frame"
+        ></iframe>
       </div>
     </div>
+
+    <section class="fw-section fw-bg-light">
+      <h2 class="fw-section-title">Aerostar Catalogues</h2>
+
+      <div class="fw-pdf-grid">
+        <a
+          href="New folder/Aerostar PDF 2025.pdf"
+          target="_blank"
+          class="fw-pdf-card"
+        >
+          <div class="pdf-icon">📄</div>
+          <h3>Fans Collection 2024</h3>
+          <p>Aerostar</p>
+        </a>
+
+        <a
+          href="New folder/Aerostar PDF 2025.pdf"
+          target="_blank"
+          class="fw-pdf-card"
+        >
+          <div class="pdf-icon">📄</div>
+          <h3>Lighting Catalogue</h3>
+          <p>Aerostar</p>
+        </a>
+      </div>
+    </section>
 
     <section class="pdf-gallery-section">
       <div class="section-header">
@@ -171,7 +251,7 @@
           <div class="pdf-toolbar">
             <h4>Aerostar Air Purifiers (Corporate)</h4>
             <a
-              href="pdf/Aerostar PDF 2025.pdf"
+              href="New folder/Aerostar PDF 2025.pdf"
               download
               class="pdf-download-btn"
             >

@@ -586,10 +586,9 @@ section {
 .brands-track {
   display: inline-flex;
   gap: 40px; /* Adjust gap as needed */
-  
+
   /* CRITICAL: Turn off the auto-moving animation */
   animation: scrollLoop 250s linear infinite;
-  
 }
 
 @keyframes scrollLoop {
@@ -1729,7 +1728,7 @@ footer {
 .pdf-item {
   background: white;
   border: 1px solid #ddd;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   border-radius: 8px;
   overflow: hidden; /* Keeps corners rounded */
 }
@@ -1772,10 +1771,10 @@ footer {
 
 /* 3. CRITICAL FIX: Make the PDF Big */
 .pdf-frame-embedded {
-  width: 100%;        /* Fill the width of the container */
-  height: 800px;      /* Make it tall! Default is only 150px */
+  width: 100%; /* Fill the width of the container */
+  height: 800px; /* Make it tall! Default is only 150px */
   border: 1px solid #ddd;
-  border-top: none;   /* Remove top border since toolbar has it */
+  border-top: none; /* Remove top border since toolbar has it */
   border-radius: 0 0 8px 8px; /* Rounded bottom corners */
   display: block;
 }
@@ -1785,7 +1784,7 @@ footer {
   .pdf-frame-embedded {
     height: 400px; /* Slightly shorter on phones */
   }
-  
+
   .pdf-toolbar {
     flex-direction: column;
     gap: 10px;

@@ -51,6 +51,56 @@
         height: 100%;
         object-fit: contain; /* Ensures the inner logo never stretches or squishes */
       }
+      /* PDF Grid Layout */
+      .fw-pdf-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 25px;
+        width: 100%;
+      }
+
+      /* PDF Card Styling */
+      .fw-pdf-card {
+        background: #ffffff;
+        border: 1px solid #eaeaea;
+        border-radius: 8px;
+        padding: 40px 20px;
+        text-align: center;
+        text-decoration: none;
+        color: #111;
+        transition: all 0.4s ease;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .fw-pdf-card:hover {
+        border-color: #d4af37;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+        transform: translateY(-8px);
+      }
+
+      /* Typography and Icons */
+      .pdf-icon {
+        font-size: 3.5rem;
+        margin-bottom: 20px;
+      }
+
+      .fw-pdf-card h3 {
+        font-family: "Playfair Display", serif;
+        font-size: 1.3rem;
+        margin: 0 0 10px 0;
+      }
+
+      .fw-pdf-card p {
+        font-family: "Lora", serif;
+        color: #d4af37;
+        font-weight: 500;
+        margin: 0;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 1px;
+      }
     </style>
   </head>
   <body>
@@ -154,10 +204,35 @@
       <div class="pdf-modal-content">
         <span class="close-pdf" onclick="closePdfModal()">&times;</span>
         <h3>Vaayura Catalog Preview</h3>
-        <iframe src="pdf/Vaayura.pdf" class="pdf-frame"></iframe>
+        <iframe src="New folder/Vaayura.pdf" class="pdf-frame"></iframe>
       </div>
     </div>
 
+    <section class="fw-section fw-bg-light">
+      <h2 class="fw-section-title">Aerostar Catalogues</h2>
+
+      <div class="fw-pdf-grid">
+        <a
+          href="pdfs/aerostar-fans-2024.pdf"
+          target="_blank"
+          class="fw-pdf-card"
+        >
+          <div class="pdf-icon">📄</div>
+          <h3>Fans Collection 2024</h3>
+          <p>Vaayura</p>
+        </a>
+
+        <a
+          href="pdfs/aerostar-lighting-2024.pdf"
+          target="_blank"
+          class="fw-pdf-card"
+        >
+          <div class="pdf-icon">📄</div>
+          <h3>Lighting Catalogue</h3>
+          <p>Vaayura</p>
+        </a>
+      </div>
+    </section>
     <section class="pdf-gallery-section">
       <div class="section-header">
         <h3>Product Catalogs</h3>
@@ -168,7 +243,7 @@
         <div class="pdf-item">
           <div class="pdf-toolbar">
             <h4>Vaayura Air Purifiers (Corporate)</h4>
-            <a href="pdf/Vaayura.pdf" download class="pdf-download-btn">
+            <a href="New folder/Vaayura.pdf" download class="pdf-download-btn">
               Download ↓
             </a>
           </div>
@@ -252,7 +327,11 @@
     <script src="header.js" defer></script>
     <script src="footer.js" defer></script>
 
-    <a href="https://wa.me/1234567890" class="whatsapp-btn" target="_blank">
+    <a
+      href="https://api.whatsapp.com/send/?phone=919811017918&text&type=phone_number&app_absent=0"
+      class="whatsapp-btn"
+      target="_blank"
+    >
       <svg
         width="35"
         height="35"

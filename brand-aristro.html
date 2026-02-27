@@ -31,6 +31,75 @@
         /* Royal Border at bottom */
         border-bottom: 4px solid var(--gold);
       }
+      .brand-logo-large {
+        width: 100%;
+        max-width: 160px; /* Adjust this value to make the circle bigger or smaller */
+        aspect-ratio: 1 / 1; /* Forces a perfect square on all devices */
+        border-radius: 50%; /* Turns the square into a perfect circle */
+        background-color: #ffffff; /* Solid white background */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 0 auto 20px auto; /* Centers the circle horizontally */
+        padding: 20px; /* Adds breathing room so the logo doesn't touch the circle edges */
+        box-sizing: border-box;
+      }
+
+      .brand-logo-large img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain; /* Ensures the inner logo never stretches or squishes */
+      }
+      /* PDF Grid Layout */
+      .fw-pdf-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 25px;
+        width: 100%;
+      }
+
+      /* PDF Card Styling */
+      .fw-pdf-card {
+        background: #ffffff;
+        border: 1px solid #eaeaea;
+        border-radius: 8px;
+        padding: 40px 20px;
+        text-align: center;
+        text-decoration: none;
+        color: #111;
+        transition: all 0.4s ease;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .fw-pdf-card:hover {
+        border-color: #d4af37;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+        transform: translateY(-8px);
+      }
+
+      /* Typography and Icons */
+      .pdf-icon {
+        font-size: 3.5rem;
+        margin-bottom: 20px;
+      }
+
+      .fw-pdf-card h3 {
+        font-family: "Playfair Display", serif;
+        font-size: 1.3rem;
+        margin: 0 0 10px 0;
+      }
+
+      .fw-pdf-card p {
+        font-family: "Lora", serif;
+        color: #d4af37;
+        font-weight: 500;
+        margin: 0;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 1px;
+      }
     </style>
   </head>
   <body>
@@ -62,7 +131,7 @@
         <div class="products-grid" id="brandProductContainer">
           <div class="product-card">
             <img
-              src="products/celing light/31mOLGI1C3L._SX342_SY445_QL70_FMwebp_.webp"
+              src="products/out door light/WhatsApp Image 2026-02-27 at 3.01.47 PM.jpeg"
               class="card-img"
             />
             <div class="card-info">
@@ -73,7 +142,7 @@
 
           <div class="product-card">
             <img
-              src="products/outdoor light/61SAw9KOK3L._SX425_.jpg"
+              src="products/out door light/WhatsApp Image 2026-02-27 at 3.01.48 PM.jpeg"
               class="card-img"
             />
             <div class="card-info">
@@ -84,7 +153,7 @@
 
           <div class="product-card">
             <img
-              src="products/outdoor light/617CvKwsqlL._SX385_.jpg"
+              src="products/out door light/WhatsApp Image 2026-02-27 at 3.01.48 PM7.jpeg"
               class="card-img"
             />
             <div class="card-info">
@@ -95,7 +164,7 @@
 
           <div class="product-card">
             <img
-              src="products/outdoor light/51MDSnaOjvL._SX522_.jpg"
+              src="products/out door light/WhatsApp Image 2026-02-27 at 3.01.48 PM76.jpeg"
               class="card-img"
             />
             <div class="card-info">
@@ -106,7 +175,7 @@
 
           <div class="product-card">
             <img
-              src="products/outdoor light/71UF+zC2x6L._SX425_.jpg"
+              src="products/out door light/WhatsApp Image 2026-02-27 at 3.01.48 PM9.jpeg"
               class="card-img"
             />
             <div class="card-info">
@@ -127,12 +196,155 @@
         <span class="close-pdf" onclick="closePdfModal()">&times;</span>
         <h3>aristro Catalog Preview</h3>
         <iframe
-          src="pdf/Aristo catlouge 23 Sep.25.pdf"
+          src="New folder/Aristo catlouge 23 Sep.25.pdf"
           class="pdf-frame"
         ></iframe>
       </div>
     </div>
 
+    <section class="fw-section fw-bg-light">
+      <h2 class="fw-section-title">Aerostar Catalogues</h2>
+
+      <div class="fw-pdf-grid">
+        <a
+          href="New folder/Aristo 100W LENS STREET LIGHT.pdf"
+          target="_blank"
+          class="fw-pdf-card"
+        >
+          <div class="pdf-icon">📄</div>
+          <h3>100W LENS STREET LIGHT</h3>
+          <p>Aristo</p>
+        </a>
+
+        <a
+          href="New folder/Aristo 100W SOLAR STREET  LIGHT.pdf"
+          target="_blank"
+          class="fw-pdf-card"
+        >
+          <div class="pdf-icon">📄</div>
+          <h3>100W SOLAR STREET LIGHT</h3>
+          <p>Aristo</p>
+        </a>
+        <a
+          href="New folder/Aristo 150W HI BAY TDS.pdf"
+          target="_blank"
+          class="fw-pdf-card"
+        >
+          <div class="pdf-icon">📄</div>
+          <h3>150W HI BAY TDS</h3>
+          <p>Aristo</p>
+        </a>
+        <a
+          href="New folder/Aristo 150W SOLAR STREET  LIGHT.pdf"
+          target="_blank"
+          class="fw-pdf-card"
+        >
+          <div class="pdf-icon">📄</div>
+          <h3>150W SOLAR STREET LIGHT</h3>
+          <p>Aristo</p>
+        </a>
+        <a
+          href="New folder/Aristo 150W STREET LIGHT  TDS.pdf"
+          target="_blank"
+          class="fw-pdf-card"
+        >
+          <div class="pdf-icon">📄</div>
+          <h3>150W STREET LIGHT TDS</h3>
+          <p>Aristo</p>
+        </a>
+        <a
+          href="New folder/Aristo 200W HI BAY TDS.pdf"
+          target="_blank"
+          class="fw-pdf-card"
+        >
+          <div class="pdf-icon">📄</div>
+          <h3>Aristo 200W HI BAY TDS</h3>
+          <p>Aristo</p>
+        </a>
+        <a
+          href="New folder/Aristo 200W RADIENCE  FLOOD  LIGHT  TDS.pdf"
+          target="_blank"
+          class="fw-pdf-card"
+        >
+          <div class="pdf-icon">📄</div>
+          <h3>200W RADIENCE FLOOD LIGHT TDS</h3>
+          <p>Aristo</p>
+        </a>
+        <a
+          href="New folder/Aristo 200W SOLAR STREET  LIGHT.pdf"
+          target="_blank"
+          class="fw-pdf-card"
+        >
+          <div class="pdf-icon">📄</div>
+          <h3>200W SOLAR STREET LIGHT</h3>
+          <p>Aristo</p>
+        </a>
+        <a
+          href="New folder/Aristo 24W STREET LIGHT TDS.pdf"
+          target="_blank"
+          class="fw-pdf-card"
+        >
+          <div class="pdf-icon">📄</div>
+          <h3>24W STREET LIGHT TDS</h3>
+          <p>Aristo</p>
+        </a>
+        <a
+          href="New folder/Aristo 36 W STREET LIGHT  TDS.pdf"
+          target="_blank"
+          class="fw-pdf-card"
+        >
+          <div class="pdf-icon">📄</div>
+          <h3>36 W STREET LIGHT TDS</h3>
+          <p>Aristo</p>
+        </a>
+        <a
+          href="New folder/Aristo 40W WELL GLASS TDS 28.12.2024_1.pdf"
+          target="_blank"
+          class="fw-pdf-card"
+        >
+          <div class="pdf-icon">📄</div>
+          <h3>40W WELL GLASS TDS</h3>
+          <p>Aristo</p>
+        </a>
+        <a
+          href="New folder/Aristo 50W RADIENCE  FLOOD  LIGHT  TDS.pdf"
+          target="_blank"
+          class="fw-pdf-card"
+        >
+          <div class="pdf-icon">📄</div>
+          <h3>50W RADIENCE FLOOD LIGHT TDS</h3>
+          <p>Aristo</p>
+        </a>
+        <a
+          href="New folder/Aristo 70W STREET LIGHT TDS.pdf"
+          target="_blank"
+          class="fw-pdf-card"
+        >
+          <div class="pdf-icon">📄</div>
+          <h3>70W STREET LIGHT TDS</h3>
+          <p>Aristo</p>
+        </a>
+        <a
+          href="New folder/Aristo 90W WELL GLASS TDS.pdf"
+          target="_blank"
+          class="fw-pdf-card"
+        >
+          <div class="pdf-icon">📄</div>
+          <h3>90W WELL GLASS TDS</h3>
+          <p>Aristo</p>
+        </a>
+        <a
+          href="New folder/Aristo catlouge 23 Sep.25.pdf"
+          target="_blank"
+          class="fw-pdf-card"
+        >
+          <div class="pdf-icon">📄</div>
+          <h3> Collection 2025</h3>
+          <p>Aristo</p>
+        </a>
+        
+      </div>
+    </section>
     <section class="pdf-gallery-section">
       <div class="section-header">
         <h3>Product Catalogs</h3>
@@ -144,7 +356,7 @@
           <div class="pdf-toolbar">
             <h4>aristro Air Purifiers (Corporate)</h4>
             <a
-              href="pdf/Aristo catlouge 23 Sep.25.pdf"
+              href="New folder/Aristo catlouge 23 Sep.25.pdf"
               download
               class="pdf-download-btn"
             >
@@ -152,7 +364,7 @@
             </a>
           </div>
           <iframe
-            src="https://docs.google.com/viewer?url=https://houseofcharming.com/New folder/pdf/Aristo catlouge 23 Sep.25.pdf&embedded=true"
+            src="https://docs.google.com/viewer?url=https://houseofcharming.com/New folder/Aristo catlouge 23 Sep.25.pdf&embedded=true"
             class="pdf-frame-embedded"
             loading="lazy"
             style="border: none"
@@ -231,7 +443,11 @@
     <script src="header.js" defer></script>
     <script src="footer.js" defer></script>
 
-    <a href="https://wa.me/1234567890" class="whatsapp-btn" target="_blank">
+    <a
+      href="https://api.whatsapp.com/send/?phone=919811017918&text&type=phone_number&app_absent=0"
+      class="whatsapp-btn"
+      target="_blank"
+    >
       <svg
         width="35"
         height="35"

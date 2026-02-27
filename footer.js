@@ -27,10 +27,10 @@ class AppFooter extends HTMLElement {
             <h4>Contact Us</h4>
             <ul class="footer-links">
               <li>
-                <a href="mailto:info@houseofcharming.com">info@houseofcharming.com</a>
+                <a href="mailto:info@houseofcharming.com">houseofcharming1991@gmail.com</a>
               </li>
-              <li><a href="tel:+1234567890">+1 (234) 567-890</a></li>
-              <li>123 Business Street, Premium City</li>
+              <li><a href="tel:+919811017918">+91 9811017918</a></li>
+              <li>M26R+Q26, Rana Ji Enclave, Ranhola, Delhi, 110041</li>
             </ul>
           </div>
         </div>
